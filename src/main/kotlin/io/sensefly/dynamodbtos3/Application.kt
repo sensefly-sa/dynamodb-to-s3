@@ -15,10 +15,17 @@ class DynamodbToS3Application {
   @Value("\${table}")
   lateinit var table: String
 
+  @Value("\${bucket}")
+  lateinit var bucket: String
+
   @Bean
   fun init(tableReader: TableReader) = CommandLineRunner {
-    log.info("Backup table {}", table)
-    tableReader.backup(table)
+    log.info("Backup table {} to {} bucket", table, bucket)
+
+    if (table.isBlank() || bucket.isBlank()) {
+      throw IllegalArgumentException("Command line parameters --table & --bucket are required")
+    }
+    tableReader.backup(table, bucket)
   }
 }
 

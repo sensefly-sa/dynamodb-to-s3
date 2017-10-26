@@ -43,6 +43,7 @@ dependencies {
   compile "com.amazonaws:aws-java-sdk-core:$awsVersion"
   compile "com.amazonaws:aws-java-sdk-dynamodb:$awsVersion"
   compile 'javax.inject:javax.inject:1'
+  compile 'com.github.alexmojaki:s3-stream-upload:1.0.1'
 
   testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
