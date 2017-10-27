@@ -40,6 +40,12 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -79,13 +85,17 @@
       <artifactId>guava</artifactId>
       <version>23.2-jre</version>
     </dependency>
+    <dependency>
+      <groupId>com.beust</groupId>
+      <artifactId>jcommander</artifactId>
+      <version>1.72</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.jetbrains.spek</groupId>
       <artifactId>spek-api</artifactId>
@@ -122,7 +132,12 @@
       <version>0.1.0</version>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>io.github.benas</groupId>
+      <artifactId>random-beans</artifactId>
+      <version>3.7.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -130,10 +145,12 @@
     <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 
     <plugins>
+
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+
       <plugin>
         <artifactId>kotlin-maven-plugin</artifactId>
         <groupId>org.jetbrains.kotlin</groupId>
@@ -168,6 +185,7 @@
           </dependency>
         </dependencies>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -185,6 +203,88 @@
           </dependency>
         </dependencies>
       </plugin>
+
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-dynamodb-local</id>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.jcabi</groupId>
+                  <artifactId>DynamoDBLocal</artifactId>
+                  <version>2015-07-16</version>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/dynamodb-dist</outputDirectory>
+                  <overWrite>false</overWrite>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>reserve-dynamodb-port</id>
+            <goals>
+              <goal>reserve-network-port</goal>
+            </goals>
+            <configuration>
+              <portNames>
+                <portName>dynamodblocal.port</portName>
+              </portNames>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.jcabi</groupId>
+        <artifactId>jcabi-dynamodb-maven-plugin</artifactId>
+        <version>0.9.1</version>
+        <configuration>
+          <tables>
+            <table>${project.build.testOutputDirectory}/users.json</table>
+          </tables>
+        </configuration>
+        <executions>
+          <execution>
+            <id>dynamodb-integration-test</id>
+            <goals>
+              <goal>start</goal>
+              <goal>create-tables</goal>
+              <goal>stop</goal>
+            </goals>
+            <configuration>
+              <port>${dynamodblocal.port}</port>
+              <dist>${project.build.directory}/dynamodb-dist</dist>
+              <arguments>
+                <argument>-inMemory</argument>
+                <argument>-sharedDb</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- tell fail safe about dynamo db local port -->
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <dynamodb.port>${dynamodblocal.port}</dynamodb.port>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 

@@ -11,7 +11,6 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import java.nio.ByteBuffer
-import java.nio.charset.StandardCharsets.UTF_8
 import java.util.*
 
 object AttributeValueSerializerSpek : Spek({
@@ -67,13 +66,13 @@ object AttributeValueSerializerSpek : Spek({
         mapper.writeValueAsString(av) shouldEqualJson """{"M": {"boolean": {"BOOL": true}, "string": {"S": "hello"}}}"""
       }
       it("should serialize binary") {
-        val byteArray = "hello world".toByteArray(UTF_8)
+        val byteArray = "hello world".toByteArray()
         val av = AttributeValue().withB(ByteBuffer.wrap(byteArray))
         mapper.writeValueAsString(av) shouldEqualJson """{ "B": "${Base64.getEncoder().encodeToString(byteArray)}" }"""
       }
       it("should serialize binary collection") {
-        val hello = "hello".toByteArray(UTF_8)
-        val world = "world".toByteArray(UTF_8)
+        val hello = "hello".toByteArray()
+        val world = "world".toByteArray()
         val av = AttributeValue().withBS(ByteBuffer.wrap(hello), ByteBuffer.wrap(world))
         mapper.writeValueAsString(av) shouldEqualJson
             """{ "BS": ["${Base64.getEncoder().encodeToString(hello)}", "${Base64.getEncoder().encodeToString(world)}"] }"""

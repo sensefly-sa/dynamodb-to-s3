@@ -48,9 +48,11 @@ class TableReader @Inject constructor(
 
     // non consistent capacity = consistent capacity * 2
     val limit = consistentReadCapacity * 2
-    val rateLimiter = RateLimiter.create(consistentReadCapacity.toDouble() * readPercentage * 10)
+    val permitsPerSec = consistentReadCapacity.toDouble() * readPercentage * 10
+    val rateLimiter = RateLimiter.create(permitsPerSec)
 
-    log.info("Start {} backup with {} limit ({} read capacity) to {}/{}", tableName, limit, consistentReadCapacity, bucket, filePath)
+    log.info("Start {} backup with {} limit and {} rate ({} read capacity) to {}/{}", tableName, limit, permitsPerSec,
+        consistentReadCapacity, bucket, filePath)
 
     val scanRequest = ScanRequest()
         .withTableName(tableName)
