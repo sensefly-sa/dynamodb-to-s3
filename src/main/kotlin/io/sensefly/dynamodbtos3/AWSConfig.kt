@@ -5,8 +5,12 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder
 import com.amazonaws.services.dynamodbv2.document.DynamoDB
+import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.module.SimpleModule
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -35,6 +39,19 @@ class AWSConfig {
     return AmazonS3ClientBuilder.standard()
         .withCredentials(credentialsProvider)
         .build()
+  }
+
+  @Bean
+  fun objectMapper(): ObjectMapper {
+
+    val module = SimpleModule()
+    module.addSerializer(AttributeValue::class.java, AttributeValueSerializer())
+
+    val mapper = ObjectMapper()
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+    mapper.registerModule(module)
+
+    return mapper
   }
 }
 
