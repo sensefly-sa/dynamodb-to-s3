@@ -28,7 +28,6 @@ class AttributeValueSerializer : StdSerializer<AttributeValue>(AttributeValue::c
       if (b != null) gen.writeBooleanField(field, b)
     }
 
-
     gen.writeStartObject()
     write(value.s, "S")
     write(value.n, "N")

@@ -79,16 +79,56 @@
       <artifactId>guava</artifactId>
       <version>23.2-jre</version>
     </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.jetbrains.spek</groupId>
+      <artifactId>spek-api</artifactId>
+      <version>1.1.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains.spek</groupId>
+      <artifactId>spek-junit-platform-engine</artifactId>
+      <version>1.1.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-runner</artifactId>
+      <version>1.0.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-test-junit</artifactId>
+      <version>${kotlin.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.amshove.kluent</groupId>
+      <artifactId>kluent</artifactId>
+      <version>1.30</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.gregwoodfill.assert</groupId>
+      <artifactId>kotlin-json-assert</artifactId>
+      <version>0.1.0</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
     <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
     <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -125,6 +165,23 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-maven-allopen</artifactId>
             <version>${kotlin.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19.1</version>
+        <configuration>
+          <includes>
+            <include>**/*Spek*</include>
+          </includes>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-surefire-provider</artifactId>
+            <version>1.0.1</version>
           </dependency>
         </dependencies>
       </plugin>
