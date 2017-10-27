@@ -1,7 +1,5 @@
 package io.sensefly.dynamodbtos3
 
-import alex.mojaki.s3upload.MultiPartOutputStream
-import alex.mojaki.s3upload.StreamTransferManager
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
@@ -32,20 +30,15 @@ class TableReader @Inject constructor(
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  private val numUploadThreads = 2
-  private val queueCapacity = 2
-  private val partSize = 5
-
 
   fun backup(tableName: String, bucket: String, readPercentage: Double = DEFAULT_READ_PERCENTAGE, pattern: String = DEFAULT_PATTERN) {
 
     val stopwatch = Stopwatch.createStarted()
 
-    val consistentReadCapacity = readCapacity(tableName)
     val dir = LocalDateTime.now().format(DateTimeFormatter.ofPattern(pattern))
     val filePath = "$dir/$tableName.json"
-    var count = 0
 
+    val consistentReadCapacity = readCapacity(tableName)
     // non consistent capacity = consistent capacity * 2
     val limit = consistentReadCapacity * 2
     val permitsPerSec = consistentReadCapacity.toDouble() * readPercentage * 10
@@ -59,61 +52,37 @@ class TableReader @Inject constructor(
         .withLimit(limit)
         .withConsistentRead(false)
         .withReturnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+    var lastKey: Map<String, AttributeValue>?
 
-    val streamManager = StreamTransferManager(bucket, filePath, amazonS3, 1, numUploadThreads, queueCapacity, partSize)
-    try {
-      streamManager.multiPartOutputStreams[0].use {
 
-        var lastKey: Map<String, AttributeValue>?
+    var count = 0
+    S3Uploader(bucket, filePath, amazonS3).use {
+      do {
+        val scanResult = amazonDynamoDB.scan(scanRequest)
 
-        do {
-          val scanResult = amazonDynamoDB.scan(scanRequest)
+        val lines = scanResult.items.joinToString(System.lineSeparator()) { item -> objectMapper.writeValueAsString(item) }
+        it.write(lines)
 
-          writeItems(scanResult.items, it) // `it` comes from use() method
-          val size = scanResult.items.size
-          count += size
+        val size = scanResult.items.size
+        count += size
 
-          lastKey = scanResult.lastEvaluatedKey
-          scanRequest.exclusiveStartKey = lastKey
+        lastKey = scanResult.lastEvaluatedKey
+        scanRequest.exclusiveStartKey = lastKey
 
-          val consumedCapacity = scanResult.consumedCapacity.capacityUnits
-          val consumed = Math.round(consumedCapacity * 10).toInt()
-          val wait = rateLimiter.acquire(consumed)
+        val consumedCapacity = scanResult.consumedCapacity.capacityUnits
+        val consumed = Math.round(consumedCapacity * 10).toInt()
+        val wait = rateLimiter.acquire(consumed)
 
-          log.debug("consumed: {}, wait: {}, capacity: {}, count: {}", consumed, wait, consumedCapacity, count)
+        log.debug("consumed: {}, wait: {}, capacity: {}, count: {}", consumed, wait, consumedCapacity, count)
 
-        } while (lastKey != null)
-
-      }
-    } catch (e: Exception) {
-      streamManager.abort(e) // aborts all uploads
-      throw e
-    } finally {
-      streamManager.complete()
+      } while (lastKey != null)
     }
-
     log.info("Backup {} tables ({} items) completed in {}", tableName, NumberFormat.getInstance().format(count), stopwatch)
 
-  }
-
-  private fun writeItems(items: List<Map<String, AttributeValue>>, outputStream: MultiPartOutputStream) {
-    val lines = items.joinToString(System.lineSeparator()) { item -> objectMapper.writeValueAsString(item) }
-    write(lines, outputStream)
-  }
-
-  /**
-   * Writing data and potentially sending off a part
-   */
-  private fun write(item: String, outputStream: MultiPartOutputStream) {
-    outputStream.write(item.toByteArray())
-    try {
-      outputStream.checkSize()
-    } catch (e: InterruptedException) {
-      throw RuntimeException(e)
-    }
   }
 
   private fun readCapacity(tableName: String): Int {
     return Math.toIntExact(dynamoDB.getTable(tableName).describe().provisionedThroughput.readCapacityUnits)
   }
+
 }
