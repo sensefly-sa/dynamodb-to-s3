@@ -56,12 +56,12 @@ class BackupTable @Inject constructor(
 
 
     var count = 0
-    writerFactory.get(bucket, filePath).use {
+    writerFactory.get(bucket, filePath).use { writer ->
       do {
         val scanResult = amazonDynamoDB.scan(scanRequest)
 
         val lines = scanResult.items.joinToString(System.lineSeparator()) { item -> objectMapper.writeValueAsString(item) }
-        it.write(lines)
+        writer.write(lines)
 
         val size = scanResult.items.size
         count += size

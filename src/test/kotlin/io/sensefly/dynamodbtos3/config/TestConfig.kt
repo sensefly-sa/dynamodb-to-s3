@@ -1,8 +1,9 @@
-package io.sensefly.dynamodbtos3
+package io.sensefly.dynamodbtos3.config
 
 import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder
+import io.sensefly.dynamodbtos3.Application
 import org.apache.logging.log4j.util.Strings
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
@@ -19,6 +20,7 @@ class TestConfig {
   fun amazonDynamoDB(): AmazonDynamoDB {
 
     val env = Strings.trimToNull(System.getProperty("dynamodb.port"))
+    // During dev, LocalDynamoDB is running on port 8000
     val port = env ?: "8000"
     val endPoint = "http://localhost:" + port
 

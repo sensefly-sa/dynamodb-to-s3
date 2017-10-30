@@ -1,4 +1,4 @@
-package io.sensefly.dynamodbtos3
+package io.sensefly.dynamodbtos3.config
 
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
@@ -11,6 +11,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
+import io.sensefly.dynamodbtos3.jackson.AttributeValueSerializer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

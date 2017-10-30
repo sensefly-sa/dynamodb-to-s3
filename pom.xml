@@ -90,6 +90,11 @@
       <artifactId>jcommander</artifactId>
       <version>1.72</version>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-kotlin</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -272,7 +277,7 @@
         <version>0.9.1</version>
         <configuration>
           <tables>
-            <table>${project.build.testOutputDirectory}/users.json</table>
+            <table>${project.build.testOutputDirectory}/users-table.json</table>
           </tables>
         </configuration>
         <executions>

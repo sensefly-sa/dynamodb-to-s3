@@ -12,7 +12,7 @@ import java.nio.file.Paths
 import javax.inject.Inject
 
 
-class BackupTableIT : AbstractIT() {
+class RestoreTableIT : AbstractIT() {
 
   @Inject
   lateinit var dynamoDB: DynamoDB

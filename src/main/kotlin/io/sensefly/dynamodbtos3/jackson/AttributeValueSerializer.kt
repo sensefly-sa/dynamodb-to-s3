@@ -1,4 +1,4 @@
-package io.sensefly.dynamodbtos3
+package io.sensefly.dynamodbtos3.jackson
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.fasterxml.jackson.core.JsonGenerator
