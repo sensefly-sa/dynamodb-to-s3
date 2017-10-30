@@ -1,10 +1,12 @@
-package io.sensefly.dynamodbtos3
+package io.sensefly.dynamodbtos3.writer
 
 import alex.mojaki.s3upload.StreamTransferManager
 import com.amazonaws.services.s3.AmazonS3
+import org.springframework.stereotype.Component
+import javax.inject.Inject
 
 
-class S3Uploader(bucket: String, filePath: String, amazonS3: AmazonS3) : AutoCloseable {
+class S3Writer constructor(bucket: String, filePath: String, amazonS3: AmazonS3) : Writer {
 
   private val numUploadThreads = 2
   private val queueCapacity = 2
@@ -16,7 +18,7 @@ class S3Uploader(bucket: String, filePath: String, amazonS3: AmazonS3) : AutoClo
   /**
    * Writing data and potentially sending off a part
    */
-  fun write(item: String) {
+  override fun write(item: String) {
     try {
       outputStream.write(item.toByteArray())
       outputStream.checkSize()
@@ -30,6 +32,15 @@ class S3Uploader(bucket: String, filePath: String, amazonS3: AmazonS3) : AutoClo
 
   override fun close() {
     streamManager.complete()
+  }
+
+}
+
+@Component
+class S3WriterFactory @Inject constructor(private val amazonS3: AmazonS3) : WriterFactory<S3Writer> {
+
+  override fun get(bucket: String, filePath: String): S3Writer {
+    return S3Writer(bucket, filePath, amazonS3)
   }
 
 }

@@ -5,10 +5,10 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.amazonaws.services.dynamodbv2.model.ReturnConsumedCapacity
 import com.amazonaws.services.dynamodbv2.model.ScanRequest
-import com.amazonaws.services.s3.AmazonS3
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Stopwatch
 import com.google.common.util.concurrent.RateLimiter
+import io.sensefly.dynamodbtos3.writer.WriterFactory
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.text.NumberFormat
@@ -17,11 +17,11 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @Component
-class TableReader @Inject constructor(
+class BackupTable @Inject constructor(
     private val dynamoDB: DynamoDB,
     private val amazonDynamoDB: AmazonDynamoDB,
-    private val amazonS3: AmazonS3,
-    private val objectMapper: ObjectMapper) {
+    private val objectMapper: ObjectMapper,
+    private val writerFactory: WriterFactory<*>) {
 
   companion object {
     const val DEFAULT_PATTERN = "yyyy/MM/dd"
@@ -56,7 +56,7 @@ class TableReader @Inject constructor(
 
 
     var count = 0
-    S3Uploader(bucket, filePath, amazonS3).use {
+    writerFactory.get(bucket, filePath).use {
       do {
         val scanResult = amazonDynamoDB.scan(scanRequest)
 
@@ -69,7 +69,8 @@ class TableReader @Inject constructor(
         lastKey = scanResult.lastEvaluatedKey
         scanRequest.exclusiveStartKey = lastKey
 
-        val consumedCapacity = scanResult.consumedCapacity.capacityUnits
+        // scanResult.consumedCapacity is null with LocalDynamoDB
+        val consumedCapacity = if (scanResult.consumedCapacity == null) 10.0 else scanResult.consumedCapacity.capacityUnits
         val consumed = Math.round(consumedCapacity * 10).toInt()
         val wait = rateLimiter.acquire(consumed)
 

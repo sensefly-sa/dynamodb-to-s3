@@ -1,7 +1,7 @@
 package io.sensefly.dynamodbtos3.commandline
 
 import com.beust.jcommander.JCommander
-import io.sensefly.dynamodbtos3.TableReader
+import io.sensefly.dynamodbtos3.BackupTable
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @Component
 @Profile("!test")
-class CommandLineRunnerImpl @Inject constructor(private val tableReader: TableReader) : CommandLineRunner {
+class CommandLineRunnerImpl @Inject constructor(private val backupTable: BackupTable) : CommandLineRunner {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -24,7 +24,7 @@ class CommandLineRunnerImpl @Inject constructor(private val tableReader: TableRe
     log.debug("args: {}", commandLineArgs)
 
     commandLineArgs.tables.parallelStream().forEach { table ->
-      tableReader.backup(table, commandLineArgs.bucket)
+      backupTable.backup(table, commandLineArgs.bucket)
     }
 
   }

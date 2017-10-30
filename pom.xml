@@ -192,7 +192,8 @@
         <version>2.19.1</version>
         <configuration>
           <includes>
-            <include>**/*Spek*</include>
+            <include>**/*Spek</include>
+            <include>**/*Test</include>
           </includes>
         </configuration>
         <dependencies>
@@ -202,6 +203,25 @@
             <version>1.0.1</version>
           </dependency>
         </dependencies>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <!--<skipTests>${integration-tests.skip}</skipTests>-->
+              <includes>
+                <include>**/*IT</include>
+                <include>**/*IT.kt</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
