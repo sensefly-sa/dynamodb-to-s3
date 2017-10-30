@@ -11,9 +11,13 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
-import io.sensefly.dynamodbtos3.jackson.AttributeValueSerializer
+import io.sensefly.dynamodbtos3.jackson.AttributeValueMixIn
+import io.sensefly.dynamodbtos3.jackson.ByteBufferDeserializer
+import io.sensefly.dynamodbtos3.jackson.ByteBufferSerializer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.nio.ByteBuffer
+
 
 @Configuration
 class Config {
@@ -46,11 +50,13 @@ class Config {
   fun objectMapper(): ObjectMapper {
 
     val module = SimpleModule()
-    module.addSerializer(AttributeValue::class.java, AttributeValueSerializer())
+    module.addSerializer(ByteBuffer::class.java, ByteBufferSerializer())
+    module.addDeserializer(ByteBuffer::class.java, ByteBufferDeserializer())
 
     val mapper = ObjectMapper()
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
     mapper.registerModule(module)
+    mapper.addMixIn(AttributeValue::class.java, AttributeValueMixIn::class.java)
 
     return mapper
   }

@@ -18,11 +18,13 @@ object AttributeValueSerializerSpek : Spek({
   given("a serializer") {
 
     val module = SimpleModule()
-    module.addSerializer(AttributeValue::class.java, AttributeValueSerializer())
+    module.addSerializer(ByteBuffer::class.java, ByteBufferSerializer())
+    module.addDeserializer(ByteBuffer::class.java, ByteBufferDeserializer())
 
     val mapper = ObjectMapper()
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
     mapper.registerModule(module)
+    mapper.addMixIn(AttributeValue::class.java, AttributeValueMixIn::class.java)
 
     on("empty AttributeValue") {
       it("should serialize") {
