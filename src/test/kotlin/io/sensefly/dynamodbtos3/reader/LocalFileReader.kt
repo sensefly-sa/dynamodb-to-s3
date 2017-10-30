@@ -13,9 +13,9 @@ class LocalFileReader(source: URL) : Reader {
 
   init {
 
-    log.debug("protocol: {}, host: {}, path: {}", source.protocol, source.host, source.path)
+    log.debug("{}; protocol: {}, path: {}", source, source.protocol, source.path)
 
-    if (source.protocol != "file" || source.path.substringAfterLast(".") != "json") {
+    if (source.protocol != "file") {
       throw IllegalArgumentException("File source must be a local file URI (ie file://folder/my-table.json)")
     }
 

@@ -78,7 +78,7 @@ class BackupTable @Inject constructor(
 
       } while (lastKey != null)
     }
-    log.info("Backup {} tables ({} items) completed in {}", tableName, NumberFormat.getInstance().format(count), stopwatch)
+    log.info("Backup {} table ({} items) completed in {}", tableName, NumberFormat.getInstance().format(count), stopwatch)
 
   }
 
