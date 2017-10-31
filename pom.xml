@@ -211,25 +211,6 @@
       </plugin>
 
       <plugin>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-            <configuration>
-              <!--<skipTests>${integration-tests.skip}</skipTests>-->
-              <includes>
-                <include>**/*IT</include>
-                <include>**/*IT.kt</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
@@ -301,14 +282,25 @@
         </executions>
       </plugin>
 
-      <!-- tell fail safe about dynamo db local port -->
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <systemPropertyVariables>
-            <dynamodb.port>${dynamodblocal.port}</dynamodb.port>
-          </systemPropertyVariables>
-        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/*IT.*</include>
+              </includes>
+              <!-- tell fail safe about dynamo db local port -->
+              <systemPropertyVariables>
+                <dynamodb.port>${dynamodblocal.port}</dynamodb.port>
+              </systemPropertyVariables>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

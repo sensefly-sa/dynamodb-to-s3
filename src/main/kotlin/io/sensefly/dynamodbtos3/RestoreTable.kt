@@ -75,7 +75,7 @@ class RestoreTable @Inject constructor(
         .withRequestItems(writeRequests)
 
     val result = amazonDynamoDB.batchWriteItem(request)
-    val consumedCapacity = if (result.consumedCapacity == null) 10.0 else result.consumedCapacity[0].capacityUnits
+    val consumedCapacity = if (result.consumedCapacity == null) 100.0 else result.consumedCapacity[0].capacityUnits
 
     val consumed = Math.round(consumedCapacity * 10).toInt()
     val wait = rateLimiter.acquire(consumed)

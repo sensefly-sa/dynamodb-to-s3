@@ -2,7 +2,6 @@ package io.sensefly.dynamodbtos3
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.document.DynamoDB
-import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.amazonaws.services.dynamodbv2.model.ReturnConsumedCapacity
 import com.amazonaws.services.dynamodbv2.model.ScanRequest
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -53,34 +52,32 @@ class BackupTable @Inject constructor(
         .withLimit(limit)
         .withConsistentRead(false)
         .withReturnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
-    var lastKey: Map<String, AttributeValue>?
-
 
     var count = 0
     writerFactory.get(bucket, filePath).use { writer ->
       do {
         val scanResult = amazonDynamoDB.scan(scanRequest)
+        if (scanResult.items.isNotEmpty()) {
+          val lines = scanResult.items.joinToString(System.lineSeparator(), postfix = System.lineSeparator()) { item ->
+            objectMapper.writeValueAsString(item)
+          }
+          writer.write(lines)
+        }
 
-        val lines = scanResult.items.joinToString(System.lineSeparator()) { item -> objectMapper.writeValueAsString(item) }
-        writer.write(lines)
+        count += scanResult.items.size
 
-        val size = scanResult.items.size
-        count += size
-
-        lastKey = scanResult.lastEvaluatedKey
-        scanRequest.exclusiveStartKey = lastKey
+        scanRequest.exclusiveStartKey = scanResult.lastEvaluatedKey
 
         // scanResult.consumedCapacity is null with LocalDynamoDB
-        val consumedCapacity = if (scanResult.consumedCapacity == null) 10.0 else scanResult.consumedCapacity.capacityUnits
+        val consumedCapacity = if (scanResult.consumedCapacity == null) 100.0 else scanResult.consumedCapacity.capacityUnits
         val consumed = Math.round(consumedCapacity * 10).toInt()
         val wait = rateLimiter.acquire(consumed)
 
         log.debug("consumed: {}, wait: {}, capacity: {}, count: {}", consumed, wait, consumedCapacity, count)
 
-      } while (lastKey != null)
+      } while (scanResult.lastEvaluatedKey != null)
     }
     log.info("Backup {} table ({} items) completed in {}", tableName, NumberFormat.getInstance().format(count), stopwatch)
-
   }
 
   private fun readCapacity(tableName: String): Int {

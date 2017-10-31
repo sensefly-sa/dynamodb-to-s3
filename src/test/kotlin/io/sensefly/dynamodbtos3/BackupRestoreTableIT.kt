@@ -62,13 +62,14 @@ class BackupRestoreTableIT {
       amazonDynamoDB.putItem("users-to-backup", item)
     }
 
+    assertThat(amazonDynamoDB.scan(ScanRequest().withTableName("users-to-backup")).items).hasSize(30)
   }
 
   @Test
   fun backupAndRestore() {
     val writerFactory = LocalFileWriterFactory(Paths.get("target"))
     val backupTable = BackupTable(dynamoDB, amazonDynamoDB, objectMapper, writerFactory)
-    backupTable.backup("users-to-backup", "users-dump")
+    backupTable.backup("users-to-backup", "users-dump", readPercentage = 100.0)
 
     val dumpFile = Paths.get("target")
         .resolve("users-dump")
@@ -77,12 +78,14 @@ class BackupRestoreTableIT {
         .toUri().toURL()
 
     val restoreTable = RestoreTable(dynamoDB, amazonDynamoDB, objectMapper, LocalFileReaderFactory())
-    restoreTable.restore(dumpFile, "users-to-restore")
+    restoreTable.restore(dumpFile, "users-to-restore", writePercentage = 100.0)
 
     val sourceItems = amazonDynamoDB.scan(ScanRequest().withTableName("users-to-backup")).items
         .sortedWith(compareBy({ it["id"]?.s }))
     val restoredItems = amazonDynamoDB.scan(ScanRequest().withTableName("users-to-restore")).items
         .sortedWith(compareBy({ it["id"]?.s }))
+
+    assertThat(sourceItems).hasSameSizeAs(restoredItems)
     assertThat(sourceItems).containsExactlyElementsOf(restoredItems)
   }
 
