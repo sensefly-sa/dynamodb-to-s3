@@ -31,7 +31,8 @@ class BackupTable @Inject constructor(
   private val log = LoggerFactory.getLogger(javaClass)
 
 
-  fun backup(tableName: String, bucket: String, readPercentage: Double = DEFAULT_READ_PERCENTAGE, pattern: String = DEFAULT_PATTERN) {
+  fun backup(tableName: String, bucket: String, readPercentage: Double = DEFAULT_READ_PERCENTAGE,
+             pattern: String = DEFAULT_PATTERN) {
 
     val stopwatch = Stopwatch.createStarted()
 

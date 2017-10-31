@@ -277,7 +277,8 @@
         <version>0.9.1</version>
         <configuration>
           <tables>
-            <table>${project.build.testOutputDirectory}/users-table.json</table>
+            <table>${project.build.testOutputDirectory}/users-to-backup.json</table>
+            <table>${project.build.testOutputDirectory}/users-to-restore.json</table>
           </tables>
         </configuration>
         <executions>

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.sensefly.dynamodbtos3.config.TestConfig
 import io.sensefly.dynamodbtos3.reader.LocalFileReaderFactory
 import io.sensefly.dynamodbtos3.writer.LocalFileWriterFactory
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,6 +17,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import java.nio.ByteBuffer
 import java.nio.file.Paths
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @RunWith(SpringRunner::class)
@@ -33,12 +35,10 @@ class BackupRestoreTableIT {
   @Inject
   lateinit var objectMapper: ObjectMapper
 
-  var items = mutableListOf<Map<String, AttributeValue>>()
-
   @Before
   fun fillTable() {
 
-    for (i in 0..5) {
+    for (i in 1..30) {
 
       val byteArray = "hello world $i".toByteArray()
 
@@ -58,34 +58,32 @@ class BackupRestoreTableIT {
           "key3" to AttributeValue().withBOOL(true))))
       item.put("empty-map", AttributeValue().withM(mutableMapOf<String, AttributeValue>()))
       item.put("attribute", AttributeValue().withL(AttributeValue("inner")))
-      items.add(item)
 
-      amazonDynamoDB.putItem("users", item)
+      amazonDynamoDB.putItem("users-to-backup", item)
     }
 
   }
 
   @Test
-  fun backup() {
-    val backupTable = BackupTable(dynamoDB, amazonDynamoDB, objectMapper, LocalFileWriterFactory(Paths.get("target")))
-    backupTable.backup("users", "users-dump")
-  }
+  fun backupAndRestore() {
+    val writerFactory = LocalFileWriterFactory(Paths.get("target"))
+    val backupTable = BackupTable(dynamoDB, amazonDynamoDB, objectMapper, writerFactory)
+    backupTable.backup("users-to-backup", "users-dump")
 
-  @Test
-  fun restore() {
+    val dumpFile = Paths.get("target")
+        .resolve("users-dump")
+        .resolve(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
+        .resolve("users-to-backup.json")
+        .toUri().toURL()
+
     val restoreTable = RestoreTable(dynamoDB, amazonDynamoDB, objectMapper, LocalFileReaderFactory())
-    restoreTable.restore(javaClass.classLoader.getResource("users-dump.json.txt"), "users")
+    restoreTable.restore(dumpFile, "users-to-restore")
 
-    val sortedItems = items.sortedWith(compareBy({ it["id"]?.s }))
-
-    val result = amazonDynamoDB.scan(ScanRequest().withTableName("users"))
-    val readItems = result.items.sortedWith(compareBy({ it["id"]?.s }))
-
-    for (i in 0..(items.size - 1)) {
-      val expected: Map<String, AttributeValue> = sortedItems[i]
-      val actual: Map<String, AttributeValue> = readItems[i]
-      Assertions.assertThat(expected).contains(*actual.entries.toTypedArray())
-    }
+    val sourceItems = amazonDynamoDB.scan(ScanRequest().withTableName("users-to-backup")).items
+        .sortedWith(compareBy({ it["id"]?.s }))
+    val restoredItems = amazonDynamoDB.scan(ScanRequest().withTableName("users-to-restore")).items
+        .sortedWith(compareBy({ it["id"]?.s }))
+    assertThat(sourceItems).containsExactlyElementsOf(restoredItems)
   }
 
 }

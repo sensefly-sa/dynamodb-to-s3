@@ -1,5 +1,5 @@
 {
-  "TableName": "users",
+  "TableName": "users-to-restore",
   "AttributeDefinitions": [
     {
       "AttributeName": "id",

@@ -33,7 +33,7 @@ class RestoreTable @Inject constructor(
     val stopwatch = Stopwatch.createStarted()
 
     val readCapacity = readCapacity(tableName)
-    val batchSize = maxOf(readCapacity, 25)
+    val batchSize = minOf(readCapacity, 25)
 
     val permitsPerSec = readCapacity.toDouble() * writePercentage * 10
     val rateLimiter = RateLimiter.create(permitsPerSec)
@@ -51,7 +51,6 @@ class RestoreTable @Inject constructor(
           if (line != null) {
             count++
             val item: Map<String, AttributeValue> = objectMapper.readValue(line)
-            log.debug("item: {}", item)
             writeRequests.add(WriteRequest(PutRequest(item)))
             if (writeRequests.size == batchSize) {
               write(mapOf(tableName to writeRequests), rateLimiter)
@@ -74,6 +73,7 @@ class RestoreTable @Inject constructor(
     val request = BatchWriteItemRequest()
         .withReturnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
         .withRequestItems(writeRequests)
+
     val result = amazonDynamoDB.batchWriteItem(request)
     val consumedCapacity = if (result.consumedCapacity == null) 10.0 else result.consumedCapacity[0].capacityUnits
 
