@@ -21,6 +21,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
+// was not able to use Spek with Spring so back to good old Junit
 @RunWith(SpringRunner::class)
 @ActiveProfiles("test")
 @SpringBootTest(classes = arrayOf(TestConfig::class))

@@ -7,7 +7,7 @@
   <artifactId>dynamodb-to-s3</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
-  <description>Backup DynamoDB tables to S3</description>
+  <description>DynamoDB backup to S3</description>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -23,6 +23,15 @@
     <java.version>1.8</java.version>
     <kotlin.version>1.1.51</kotlin.version>
     <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+
+    <aws.version>1.11.220</aws.version>
+    <guava.version>23.2-jre</guava.version>
+    <jcommander.version>1.72</jcommander.version>
+    <junit-platform-runner.version>1.0.0</junit-platform-runner.version>
+    <kluent.version>1.30</kluent.version>
+    <kotlin-json-assert.version>0.1.0</kotlin-json-assert.version>
+    <spek.version>1.1.5</spek.version>
+    <s3-stream-upload.version>1.0.1</s3-stream-upload.version>
   </properties>
 
   <dependencies>
@@ -68,7 +77,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-dynamodb</artifactId>
-      <version>1.11.220</version>
+      <version>${aws.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.inject</groupId>
@@ -78,17 +87,17 @@
     <dependency>
       <groupId>com.github.alexmojaki</groupId>
       <artifactId>s3-stream-upload</artifactId>
-      <version>1.0.1</version>
+      <version>${s3-stream-upload.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>23.2-jre</version>
+      <version>${guava.version}</version>
     </dependency>
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
-      <version>1.72</version>
+      <version>${jcommander.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
@@ -104,19 +113,19 @@
     <dependency>
       <groupId>org.jetbrains.spek</groupId>
       <artifactId>spek-api</artifactId>
-      <version>1.1.5</version>
+      <version>${spek.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.spek</groupId>
       <artifactId>spek-junit-platform-engine</artifactId>
-      <version>1.1.5</version>
+      <version>${spek.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-runner</artifactId>
-      <version>1.0.0</version>
+      <version>${junit-platform-runner.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -128,19 +137,13 @@
     <dependency>
       <groupId>org.amshove.kluent</groupId>
       <artifactId>kluent</artifactId>
-      <version>1.30</version>
+      <version>${kluent.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.gregwoodfill.assert</groupId>
       <artifactId>kotlin-json-assert</artifactId>
-      <version>0.1.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.github.benas</groupId>
-      <artifactId>random-beans</artifactId>
-      <version>3.7.0</version>
+      <version>${kotlin-json-assert.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -164,7 +167,7 @@
           <compilerPlugins>
             <plugin>spring</plugin>
           </compilerPlugins>
-          <jvmTarget>1.8</jvmTarget>
+          <jvmTarget>${java.version}</jvmTarget>
         </configuration>
         <executions>
           <execution>
@@ -194,7 +197,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.19.1</version>
         <configuration>
           <includes>
             <include>**/*Spek</include>
