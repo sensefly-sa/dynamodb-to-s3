@@ -10,7 +10,7 @@ import com.google.common.util.concurrent.RateLimiter
 import io.sensefly.dynamodbtos3.reader.ReaderFactory
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import java.net.URL
+import java.net.URI
 import java.text.NumberFormat
 import javax.inject.Inject
 
@@ -24,22 +24,22 @@ class RestoreTable @Inject constructor(
 
   companion object {
     const val DEFAULT_WRITE_PERCENTAGE = 0.5
+    private const val LOG_PROGRESS_FREQ = 5000
   }
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  fun restore(source: URL, tableName: String, writePercentage: Double = RestoreTable.DEFAULT_WRITE_PERCENTAGE) {
+  fun restore(source: URI, tableName: String, writePercentage: Double = DEFAULT_WRITE_PERCENTAGE) {
 
     val stopwatch = Stopwatch.createStarted()
 
-    val readCapacity = readCapacity(tableName)
-    val batchSize = minOf(readCapacity, 25)
+    val writeCapacity = readCapacity(tableName)
+    val batchSize = minOf(writeCapacity, 25)
 
-    val permitsPerSec = readCapacity.toDouble() * writePercentage * 10
+    val permitsPerSec = writeCapacity.toDouble() * writePercentage * 10
     val rateLimiter = RateLimiter.create(permitsPerSec)
 
-    log.info("Start {} restore from {} with {} limit and {} rate ({} read capacity)", tableName, source, permitsPerSec,
-        readCapacity)
+    log.info("Start {} restore from {} with {} rate ({} write capacity)", tableName, source, permitsPerSec, writeCapacity)
 
     val writeRequests = mutableListOf<WriteRequest>()
     var count = 0
@@ -57,6 +57,9 @@ class RestoreTable @Inject constructor(
               writeRequests.clear()
             }
           }
+          if (count % LOG_PROGRESS_FREQ == 0) {
+            log.info("Table {}: {} items written ({})", tableName, NumberFormat.getInstance().format(count), stopwatch)
+          }
         } while (line != null)
 
         // insert remaining items
@@ -66,7 +69,6 @@ class RestoreTable @Inject constructor(
       }
     }
     log.info("Restore {} table ({} items) completed in {}", tableName, NumberFormat.getInstance().format(count), stopwatch)
-
   }
 
   private fun write(writeRequests: Map<String, List<WriteRequest>>, rateLimiter: RateLimiter) {

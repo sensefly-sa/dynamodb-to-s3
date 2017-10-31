@@ -1,7 +1,7 @@
 package io.sensefly.dynamodbtos3.reader
 
 import java.io.InputStream
-import java.net.URL
+import java.net.URI
 
 
 interface Reader : AutoCloseable {
@@ -9,5 +9,5 @@ interface Reader : AutoCloseable {
 }
 
 interface ReaderFactory<out T : Reader> {
-  fun get(source: URL): T
+  fun get(source: URI): T
 }

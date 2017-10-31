@@ -14,7 +14,6 @@ class S3Writer constructor(bucket: String, filePath: String, amazonS3: AmazonS3)
   private var streamManager = StreamTransferManager(bucket, filePath, amazonS3, 1, numUploadThreads, queueCapacity, partSize)
   private var outputStream = streamManager.multiPartOutputStreams[0]
 
-
   /**
    * Writing data and potentially sending off a part
    */
@@ -23,7 +22,7 @@ class S3Writer constructor(bucket: String, filePath: String, amazonS3: AmazonS3)
       outputStream.write(item.toByteArray())
       outputStream.checkSize()
     } catch (e: InterruptedException) {
-//      throw RuntimeException(e)
+      throw RuntimeException(e)
     } catch (e: Exception) {
       streamManager.abort(e) // aborts all uploads
       throw e
@@ -31,6 +30,7 @@ class S3Writer constructor(bucket: String, filePath: String, amazonS3: AmazonS3)
   }
 
   override fun close() {
+    outputStream.close()
     streamManager.complete()
   }
 

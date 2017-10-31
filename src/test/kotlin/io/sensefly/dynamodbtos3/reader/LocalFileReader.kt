@@ -1,25 +1,19 @@
 package io.sensefly.dynamodbtos3.reader
 
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
-import java.net.URL
+import java.net.URI
 
-class LocalFileReader(source: URL) : Reader {
-
-  private val log = LoggerFactory.getLogger(javaClass)
+class LocalFileReader(source: URI) : Reader {
 
   private var inputStream: FileInputStream? = null
 
   init {
-
-    log.debug("{}; protocol: {}, path: {}", source, source.protocol, source.path)
-
-    if (source.protocol != "file") {
+    if (source.scheme != "file") {
       throw IllegalArgumentException("File source must be a local file URI (ie file://folder/my-table.json)")
     }
 
-    val file = File(source.toURI())
+    val file = File(source)
     if (!file.exists()) {
       throw IllegalArgumentException("File $source does not exist")
     }
@@ -39,7 +33,7 @@ class LocalFileReader(source: URL) : Reader {
 
 class LocalFileReaderFactory : ReaderFactory<LocalFileReader> {
 
-  override fun get(source: URL): LocalFileReader {
+  override fun get(source: URI): LocalFileReader {
     return LocalFileReader(source)
   }
 

@@ -25,6 +25,7 @@ class BackupTable @Inject constructor(
   companion object {
     const val DEFAULT_PATTERN = "yyyy/MM/dd"
     const val DEFAULT_READ_PERCENTAGE = 0.5
+    private const val LOG_PROGRESS_FREQ = 5000
   }
 
   private val log = LoggerFactory.getLogger(javaClass)
@@ -54,6 +55,7 @@ class BackupTable @Inject constructor(
         .withReturnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
 
     var count = 0
+    var lastPrint = LOG_PROGRESS_FREQ
     writerFactory.get(bucket, filePath).use { writer ->
       do {
         val scanResult = amazonDynamoDB.scan(scanRequest)
@@ -65,6 +67,10 @@ class BackupTable @Inject constructor(
         }
 
         count += scanResult.items.size
+        if (count > lastPrint) {
+          log.info("Table {}: {} items sent ({})", tableName, NumberFormat.getInstance().format(lastPrint), stopwatch)
+          lastPrint += LOG_PROGRESS_FREQ
+        }
 
         scanRequest.exclusiveStartKey = scanResult.lastEvaluatedKey
 

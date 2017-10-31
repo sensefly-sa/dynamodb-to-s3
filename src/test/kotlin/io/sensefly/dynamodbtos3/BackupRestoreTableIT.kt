@@ -76,7 +76,7 @@ class BackupRestoreTableIT {
         .resolve("users-dump")
         .resolve(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
         .resolve("users-to-backup.json")
-        .toUri().toURL()
+        .toUri()
 
     val restoreTable = RestoreTable(dynamoDB, amazonDynamoDB, objectMapper, LocalFileReaderFactory())
     restoreTable.restore(dumpFile, "users-to-restore", writePercentage = 100.0)
