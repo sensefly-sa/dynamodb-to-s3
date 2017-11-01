@@ -4,3 +4,4 @@ services:
   - docker
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t db72c61d-aa61-4b80-9ffd-1a135d29a85f
+  - ./mvnw coveralls:report
