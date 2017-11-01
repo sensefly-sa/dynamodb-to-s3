@@ -14,27 +14,25 @@ class CommandLineParser @Inject constructor(
     private val backupTable: BackupTable,
     private val restoreTable: RestoreTable) : CommandLineRunner {
 
-  internal val mainCommand = MainCommand()
-  internal val backupArgs = BackupCommand()
-  internal val restoreArgs = RestoreCommand()
+  internal val backupCmd = BackupCommand()
+  internal val restoreCmd = RestoreCommand()
 
   override fun run(vararg args: String?) {
     val jc = JCommander.newBuilder()
-        .addObject(mainCommand)
-        .addCommand("backup", backupArgs)
-        .addCommand("restore", restoreArgs)
+        .addObject(MainCommand())
+        .addCommand("backup", backupCmd)
+        .addCommand("restore", restoreCmd)
         .build()
     jc.parse(*args)
 
-    val command = jc.parsedCommand
-    when (command) {
+    when (jc.parsedCommand) {
       "backup" -> {
-        backupArgs.tables.parallelStream().forEach { table ->
-          backupTable.backup(table, backupArgs.bucket, backupArgs.readPercentage, backupArgs.pattern)
+        backupCmd.tables.parallelStream().forEach { table ->
+          backupTable.backup(table, backupCmd.bucket, backupCmd.readPercentage, backupCmd.pattern)
         }
       }
       "restore" -> {
-        restoreTable.restore(restoreArgs.source!!, restoreArgs.table, restoreArgs.writePercentage)
+        restoreTable.restore(restoreCmd.source!!, restoreCmd.table, restoreCmd.writePercentage)
       }
       null -> {
         jc.usage()

@@ -22,8 +22,8 @@ object CommandLineParserSpek : Spek({
 
       it("should parse args") {
         parser.run("backup", "--table", "table1", "--table", "table2", "--bucket", "my-bucket")
-        parser.backupArgs.tables shouldEqual listOf("table1", "table2")
-        parser.backupArgs.bucket shouldEqual "my-bucket"
+        parser.backupCmd.tables shouldEqual listOf("table1", "table2")
+        parser.backupCmd.bucket shouldEqual "my-bucket"
       }
 
     }
@@ -32,8 +32,8 @@ object CommandLineParserSpek : Spek({
 
       it("should parse args") {
         parser.run("restore", "--table", "table1", "--source", "s3://bucket/folder/table1.json")
-        parser.restoreArgs.table shouldEqual "table1"
-        parser.restoreArgs.source shouldEqual URI("s3://bucket/folder/table1.json")
+        parser.restoreCmd.table shouldEqual "table1"
+        parser.restoreCmd.source shouldEqual URI("s3://bucket/folder/table1.json")
       }
 
     }

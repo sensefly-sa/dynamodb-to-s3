@@ -1,0 +1,6 @@
+# https://docs.docker.com/engine/reference/builder/#dockerignore-file
+# by default ignore everything except the jar file and log4j config
+
+**/*
+!*.jar
+!log4j-cloudwatch.xml

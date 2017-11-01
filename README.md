@@ -66,13 +66,22 @@ java -jar dynamodb-to-s3-<version>.jar restore \
 ## AWS credentials
 
 AWS credentials are read using [DefaultAWSCredentialsProviderChain](http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html):
-* Environment Variables - `AWS_ACCESS_KEY` and `AWS_SECRET_KEY`
-* Java System Properties - `aws.accessKeyId` and `aws.secretKey`
+* Environment Variables: `AWS_ACCESS_KEY`, `AWS_SECRET_KEY` and `AWS_REGION`
+* Java System Properties: `aws.accessKeyId` and `aws.secretKey`
 * Credential profiles file at the default location (`~/.aws/credentials`) shared by all AWS SDKs and the AWS CLI
 * Credentials delivered through the Amazon EC2 container service if `AWS_CONTAINER_CREDENTIALS_RELATIVE_URI` environment 
 variable is set and security manager has permission to access the variable
 * Instance profile credentials delivered through the Amazon EC2 metadata service
 
+## Running with Docker
+
+```
+docker run \
+  -e AWS_ACCESS_KEY=... \
+  -e AWS_SECRET_KEY=... \
+  -e AWS_REGION=... \
+  sensefly/dynamodb-to-s3 --help
+```
 
 ## Build
 
