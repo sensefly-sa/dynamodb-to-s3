@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/sensefly-sa/dynamodb-to-s3.svg?branch=master)](https://travis-ci.org/sensefly-sa/dynamodb-to-s3)
 [![codecov](https://codecov.io/gh/sensefly-sa/dynamodb-to-s3/branch/master/graph/badge.svg)](https://codecov.io/gh/sensefly-sa/dynamodb-to-s3)
-
+[![Coverage Status](https://coveralls.io/repos/github/sensefly-sa/dynamodb-to-s3/badge.svg?branch=master)](https://coveralls.io/github/sensefly-sa/dynamodb-to-s3?branch=master)
 
 Simple DynamoDB dump to S3.
   
