@@ -18,11 +18,14 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-// was not able to use Spek with Spring so back to good old Junit
 @RunWith(SpringRunner::class)
 @ActiveProfiles("test")
 @SpringBootTest(classes = arrayOf(TestConfig::class))
 class BackupRestoreTableIT {
+
+  companion object {
+    const val BUCKET = "test-bucket"
+  }
 
   @Inject
   lateinit var amazonDynamoDB: AmazonDynamoDB
@@ -68,16 +71,16 @@ class BackupRestoreTableIT {
 
   @Before
   fun createBucket() {
-    amazonS3.createBucket("test-bucket")
+    amazonS3.createBucket(BUCKET)
   }
 
   @Test
   fun backupAndRestore() {
-    backupTable.backup("users-to-backup", "test-bucket", readPercentage = 100.0)
+    backupTable.backup("users-to-backup", BUCKET, readPercentage = 100.0)
 
-    val dir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+    val dirs = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
 
-    restoreTable.restore(URI("s3://test-bucket/$dir/users-to-backup.json"), "users-to-restore", writePercentage = 100.0)
+    restoreTable.restore(URI("s3://$BUCKET/$dirs/users-to-backup.json"), "users-to-restore", writePercentage = 100.0)
 
     val sourceItems = amazonDynamoDB.scan(ScanRequest().withTableName("users-to-backup")).items
         .sortedWith(compareBy({ it["id"]?.s }))
