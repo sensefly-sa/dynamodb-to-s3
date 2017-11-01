@@ -1,5 +1,7 @@
 # Backup DynamoDB to S3
 
+[![Build Status](https://travis-ci.org/sensefly-sa/dynamodb-to-s3.svg?branch=master)](https://travis-ci.org/sensefly-sa/dynamodb-to-s3)
+
 Simple DynamoDB dump to S3.
   
 Read & write rates are limited by applying a ratio (`read-percentage`/`write-percentage`) to table's provisioned capacities.
