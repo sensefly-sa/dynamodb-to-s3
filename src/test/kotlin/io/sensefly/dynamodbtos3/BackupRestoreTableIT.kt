@@ -1,13 +1,10 @@
 package io.sensefly.dynamodbtos3
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.amazonaws.services.dynamodbv2.model.ScanRequest
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.amazonaws.services.s3.AmazonS3
 import io.sensefly.dynamodbtos3.config.TestConfig
-import io.sensefly.dynamodbtos3.reader.LocalFileReaderFactory
-import io.sensefly.dynamodbtos3.writer.LocalFileWriterFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -15,8 +12,8 @@ import org.junit.runner.RunWith
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
+import java.net.URI
 import java.nio.ByteBuffer
-import java.nio.file.Paths
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -28,13 +25,16 @@ import javax.inject.Inject
 class BackupRestoreTableIT {
 
   @Inject
-  lateinit var dynamoDB: DynamoDB
-
-  @Inject
   lateinit var amazonDynamoDB: AmazonDynamoDB
 
   @Inject
-  lateinit var objectMapper: ObjectMapper
+  lateinit var amazonS3: AmazonS3
+
+  @Inject
+  lateinit var backupTable: BackupTable
+
+  @Inject
+  lateinit var restoreTable: RestoreTable
 
   @Before
   fun fillTable() {
@@ -66,20 +66,18 @@ class BackupRestoreTableIT {
     assertThat(amazonDynamoDB.scan(ScanRequest().withTableName("users-to-backup")).items).hasSize(30)
   }
 
+  @Before
+  fun createBucket() {
+    amazonS3.createBucket("test-bucket")
+  }
+
   @Test
   fun backupAndRestore() {
-    val writerFactory = LocalFileWriterFactory(Paths.get("target"))
-    val backupTable = BackupTable(dynamoDB, amazonDynamoDB, objectMapper, writerFactory)
-    backupTable.backup("users-to-backup", "users-dump", readPercentage = 100.0)
+    backupTable.backup("users-to-backup", "test-bucket", readPercentage = 100.0)
 
-    val dumpFile = Paths.get("target")
-        .resolve("users-dump")
-        .resolve(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
-        .resolve("users-to-backup.json")
-        .toUri()
+    val dir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
 
-    val restoreTable = RestoreTable(dynamoDB, amazonDynamoDB, objectMapper, LocalFileReaderFactory())
-    restoreTable.restore(dumpFile, "users-to-restore", writePercentage = 100.0)
+    restoreTable.restore(URI("s3://test-bucket/$dir/users-to-backup.json"), "users-to-restore", writePercentage = 100.0)
 
     val sourceItems = amazonDynamoDB.scan(ScanRequest().withTableName("users-to-backup")).items
         .sortedWith(compareBy({ it["id"]?.s }))
