@@ -368,34 +368,6 @@
               <dataFile>${project.build.directory}/jacoco-it.exec</dataFile>
             </configuration>
           </execution>
-          <execution>
-            <id>merge-results</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>merge</goal>
-            </goals>
-            <configuration>
-              <fileSets>
-                <fileSet>
-                  <directory>${project.build.directory}</directory>
-                  <includes>
-                    <include>*.exec</include>
-                  </includes>
-                </fileSet>
-              </fileSets>
-              <destFile>${project.build.directory}/jacoco.exec</destFile>
-            </configuration>
-          </execution>
-          <execution>
-            <id>post-merge-report</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <configuration>
-              <dataFile>${project.build.directory}/jacoco.exec</dataFile>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
 
@@ -427,15 +399,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.eluder.coveralls</groupId>
-        <artifactId>coveralls-maven-plugin</artifactId>
-        <version>4.3.0</version>
-        <configuration>
-          <repoToken>rwBi1kJXYJdfyW6gk3kypMf9l6AHghC9D</repoToken>
-        </configuration>
       </plugin>
 
     </plugins>
