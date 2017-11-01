@@ -1,6 +1,8 @@
 # Backup DynamoDB to S3
 
 [![Build Status](https://travis-ci.org/sensefly-sa/dynamodb-to-s3.svg?branch=master)](https://travis-ci.org/sensefly-sa/dynamodb-to-s3)
+[![codecov](https://codecov.io/gh/sensefly-sa/dynamodb-to-s3/branch/master/graph/badge.svg)](https://codecov.io/gh/sensefly-sa/dynamodb-to-s3)
+
 
 Simple DynamoDB dump to S3.
   
