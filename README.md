@@ -21,7 +21,8 @@ Usage: <main class> [options] [command] [command options]
       Usage: backup [options]
         Options:
         * -t, --table
-            Table to backup to S3. Repeat this param to backup multiple tables. 
+            Table to backup to S3. 
+            Comma-separated list to backup multiple tables or repeat this param.
             Default: []
         * -b, --bucket
             Destination S3 bucket.

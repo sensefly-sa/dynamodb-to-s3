@@ -27,7 +27,7 @@ class CommandLineParser @Inject constructor(
 
     when (jc.parsedCommand) {
       "backup" -> {
-        backupRunner.run(backupCmd.tables, backupCmd.bucket, backupCmd.cron, backupCmd.readPercentage, backupCmd.pattern)
+        backupRunner.run(backupCmd.parseTables(), backupCmd.bucket, backupCmd.cron, backupCmd.readPercentage, backupCmd.pattern)
       }
       "restore" -> {
         restoreTable.restore(restoreCmd.source!!, restoreCmd.table, restoreCmd.writePercentage)

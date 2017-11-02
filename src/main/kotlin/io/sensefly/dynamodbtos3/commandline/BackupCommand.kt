@@ -7,7 +7,7 @@ import io.sensefly.dynamodbtos3.BackupTable
 @Parameters(commandDescription = "Backup DynamoDB tables to S3 bucket.")
 class BackupCommand {
 
-  @Parameter(names = arrayOf("-t", "--table"), description = "Table to backup to S3. Repeat this param to backup multiple tables.", required = true, order = 0)
+  @Parameter(names = arrayOf("-t", "--table"), description = "Table to backup to S3. Comma-separated list to backup multiple tables or repeat this param.", required = true, order = 0)
   var tables: List<String> = arrayListOf()
 
   @Parameter(names = arrayOf("-b", "--bucket"), description = "Destination S3 bucket.", required = true, order = 1)
@@ -21,5 +21,12 @@ class BackupCommand {
 
   @Parameter(names = arrayOf("-p", "--pattern"), description = "Destination file path pattern.", order = 4)
   var pattern: String = BackupTable.DEFAULT_PATTERN
+
+  fun parseTables(): List<String> {
+    return tables.map { it.split(",") }
+        .flatten()
+        .filter { it.isNotBlank() }
+        .map { it.trim() }
+  }
 
 }
