@@ -21,7 +21,7 @@ class CommandLineParser @Inject constructor(
   internal val restoreCmd = RestoreCommand()
 
   override fun run(vararg args: String?) {
-    log.info("Run with {}", args.joinToString(" "))
+    log.info("Run with {}", args.toList())
 
     val jc = JCommander.newBuilder()
         .addObject(MainCommand())
