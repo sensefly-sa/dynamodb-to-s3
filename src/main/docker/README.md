@@ -16,18 +16,20 @@ $ docker run \
 Usage: <main class> [options] [command] [command options]
   Options:
     --help
-
+      Print usage
   Commands:
     backup      Backup DynamoDB tables to S3 bucket.
       Usage: backup [options]
         Options:
         * -t, --table
-            Table to backup to S3. 
-            Repeat this param to backup multiple tables.
+            Table to backup to S3. Repeat this param to backup multiple 
+            tables. 
             Default: []
         * -b, --bucket
             Destination S3 bucket.
             Default: <empty string>
+          -c, --cron
+            Cron pattern. (http://www.manpagez.com/man/5/crontab/)
           -r, --read-percentage
             Read capacity percentage.
             Default: 0.5
@@ -42,7 +44,7 @@ Usage: <main class> [options] [command] [command options]
             Table to restore.
             Default: <empty string>
         * -s, --source
-            Full S3 path to a JSON backup file 
+            S3 URI to a JSON backup file 
             (s3://my-bucket/folder/my-table.json). 
           -w, --write-percentage
             Write capacity percentage.

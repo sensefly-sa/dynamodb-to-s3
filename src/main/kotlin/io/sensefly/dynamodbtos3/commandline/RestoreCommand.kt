@@ -17,8 +17,4 @@ class RestoreCommand {
   @Parameter(names = arrayOf("-w", "--write-percentage"), description = "Write capacity percentage.", order = 3)
   var writePercentage: Double = RestoreTable.DEFAULT_WRITE_PERCENTAGE
 
-  override fun toString(): String {
-    return "RestoreCommand(table='$table', source=$source, writePercentage=$writePercentage)"
-  }
-
 }

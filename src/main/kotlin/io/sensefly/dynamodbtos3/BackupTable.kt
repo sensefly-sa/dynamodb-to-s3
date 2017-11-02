@@ -30,10 +30,25 @@ class BackupTable @Inject constructor(
 
   private val log = LoggerFactory.getLogger(javaClass)
 
+  private val running = mutableSetOf<String>()
 
   fun backup(tableName: String, bucket: String, readPercentage: Double = DEFAULT_READ_PERCENTAGE,
              pattern: String = DEFAULT_PATTERN) {
 
+    if (running.contains(tableName)) {
+      log.info("Skip $tableName backup as it is already running...")
+      return
+    }
+
+    running.add(tableName)
+    try {
+      backupTable(pattern, tableName, readPercentage, bucket)
+    } finally {
+      running.remove(tableName)
+    }
+  }
+
+  private fun backupTable(pattern: String, tableName: String, readPercentage: Double, bucket: String) {
     val stopwatch = Stopwatch.createStarted()
 
     val dir = LocalDateTime.now().format(DateTimeFormatter.ofPattern(pattern))
@@ -68,7 +83,7 @@ class BackupTable @Inject constructor(
 
         count += scanResult.items.size
         if (count > lastPrint) {
-          log.info("Table {}: {} items sent ({})", tableName, NumberFormat.getInstance().format(lastPrint), stopwatch)
+          log.info("[{}] {} items sent ({})", tableName, NumberFormat.getInstance().format(lastPrint), stopwatch)
           lastPrint += LOG_PROGRESS_FREQ
         }
 

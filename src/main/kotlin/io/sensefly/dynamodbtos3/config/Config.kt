@@ -16,6 +16,7 @@ import io.sensefly.dynamodbtos3.jackson.ByteBufferDeserializer
 import io.sensefly.dynamodbtos3.jackson.ByteBufferSerializer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import java.nio.ByteBuffer
 
 
@@ -59,6 +60,14 @@ class Config {
     mapper.addMixIn(AttributeValue::class.java, AttributeValueMixIn::class.java)
 
     return mapper
+  }
+
+  @Bean
+  fun threadPoolTaskScheduler(): ThreadPoolTaskScheduler {
+    val scheduler = ThreadPoolTaskScheduler()
+    scheduler.poolSize = 5
+    scheduler.threadNamePrefix = "scheduler"
+    return scheduler
   }
 }
 
