@@ -398,6 +398,24 @@
               <tag>latest</tag>
             </configuration>
           </execution>
+          <execution>
+            <id>push-latest</id>
+            <goals>
+              <goal>push</goal>
+            </goals>
+            <configuration>
+              <tag>latest</tag>
+            </configuration>
+          </execution>
+          <execution>
+            <id>push-version</id>
+            <goals>
+              <goal>push</goal>
+            </goals>
+            <configuration>
+              <tag>${project.version}</tag>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
