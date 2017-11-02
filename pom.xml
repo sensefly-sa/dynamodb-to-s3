@@ -34,6 +34,7 @@
     <s3-stream-upload.version>1.0.1</s3-stream-upload.version>
     <s3mock.version>0.2.3</s3mock.version>
 
+    <antrun-plugin.version>1.8</antrun-plugin.version>
     <dockerfile-plugin.version>1.3.6</dockerfile-plugin.version>
     <jacoco-plugin.version>0.7.9</jacoco-plugin.version>
     <jcabi-dynamodb-plugin.version>0.9.1</jcabi-dynamodb-plugin.version>
@@ -185,6 +186,26 @@
                 </resource>
               </resources>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- awful hack because maven-resources-plugin lost file permissions -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>${antrun-plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <configuration>
+              <target>
+                <chmod file="${project.build.directory}/entrypoint.sh" perm="755"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

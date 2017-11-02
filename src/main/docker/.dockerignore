@@ -3,4 +3,5 @@
 
 **/*
 !*.jar
+!entrypoint.sh
 !log4j-cloudwatch.xml

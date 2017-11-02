@@ -4,10 +4,10 @@ ENV SPRING_OUTPUT_ANSI_ENABLED ALWAYS
 ENV JAVA_OPTS ""
 
 ADD @project.build.finalName@.jar /app.jar
-
 ADD log4j-cloudwatch.xml /
+ADD entrypoint.sh /
 
 RUN sh -c 'touch /app.jar'
 
-ENTRYPOINT ["/bin/sh", "-c", "exec /usr/bin/java $JAVA_OPTS -jar /app.jar $0 $@"]
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["--help"]
