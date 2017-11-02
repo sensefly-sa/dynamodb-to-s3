@@ -3,6 +3,7 @@ package io.sensefly.dynamodbtos3.commandline
 import com.beust.jcommander.JCommander
 import io.sensefly.dynamodbtos3.BackupRunner
 import io.sensefly.dynamodbtos3.RestoreTable
+import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
@@ -14,10 +15,14 @@ class CommandLineParser @Inject constructor(
     private val backupRunner: BackupRunner,
     private val restoreTable: RestoreTable) : CommandLineRunner {
 
+  private val log = LoggerFactory.getLogger(javaClass)
+
   internal val backupCmd = BackupCommand()
   internal val restoreCmd = RestoreCommand()
 
   override fun run(vararg args: String?) {
+    log.info("Run with {}", args.joinToString(" "))
+
     val jc = JCommander.newBuilder()
         .addObject(MainCommand())
         .addCommand("backup", backupCmd)
