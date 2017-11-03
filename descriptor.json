@@ -5,9 +5,18 @@
     "subject": "sensefly",
     "publish": true,
     "version": {
-      "name": "0.0.1",
+      "name": "master",
       "gpgSign": false
-    }
+    },
+    "files": [
+      {
+        "includePattern": "target/dynamodb-to-s3-(.*).jar",
+        "excludePattern": "target/dynamodb-to-s3-(.*)-docker-info.jar",
+        "matrixParams": {
+          "override": 1
+        }
+      }
+    ]
   }
 }
 
