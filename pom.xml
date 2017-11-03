@@ -428,34 +428,6 @@
               <contextDirectory>${project.build.directory}</contextDirectory>
             </configuration>
           </execution>
-          <execution>
-            <id>tag</id>
-            <goals>
-              <goal>tag</goal>
-            </goals>
-            <configuration>
-              <repository>${docker.image.name}</repository>
-              <tag>latest</tag>
-            </configuration>
-          </execution>
-          <execution>
-            <id>push-latest</id>
-            <goals>
-              <goal>push</goal>
-            </goals>
-            <configuration>
-              <tag>latest</tag>
-            </configuration>
-          </execution>
-          <execution>
-            <id>push-version</id>
-            <goals>
-              <goal>push</goal>
-            </goals>
-            <configuration>
-              <tag>${project.version}</tag>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
 
