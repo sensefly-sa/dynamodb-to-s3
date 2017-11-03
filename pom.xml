@@ -428,6 +428,15 @@
               <contextDirectory>${project.build.directory}</contextDirectory>
             </configuration>
           </execution>
+          <execution>
+            <id>push</id>
+            <goals>
+              <goal>push</goal>
+            </goals>
+            <configuration>
+              <tag>${project.version}</tag>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
