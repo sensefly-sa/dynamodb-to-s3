@@ -28,6 +28,14 @@
     <developerConnection>scm:git:git@github.com:sensefly-sa/dynamodb-to-s3.git</developerConnection>
   </scm>
 
+  <distributionManagement>
+    <repository>
+      <id>bintray</id>
+      <name>sensefly-maven</name>
+      <url>https://api.bintray.com/maven/sensefly/maven/dynamodb-to-s3/;publish=1</url>
+    </repository>
+  </distributionManagement>
+
   <properties>
     <docker.image.name>sensefly/dynamodb-to-s3</docker.image.name>
 
