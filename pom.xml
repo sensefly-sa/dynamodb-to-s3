@@ -5,7 +5,7 @@
 
   <groupId>io.sensefly.dynamodb-to-s3</groupId>
   <artifactId>dynamodb-to-s3</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
 
   <description>Simple DynamoDB backup to S3</description>
 
