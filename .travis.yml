@@ -10,4 +10,4 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t db72c61d-aa61-4b80-9ffd-1a135d29a85f
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-  - ./mvnw deploy -DskipTests -B --settings .mvn/settings.xml
+  - ./mvnw dockerfile:push deploy -DskipTests -B --settings .mvn/settings.xml
