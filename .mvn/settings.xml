@@ -8,18 +8,18 @@
     </server>
   </servers>
 
-  <!--<profiles>-->
-  <!--<profile>-->
-  <!--<id>ossrh</id>-->
-  <!--<activation>-->
-  <!--<activeByDefault>true</activeByDefault>-->
-  <!--</activation>-->
-  <!--<properties>-->
-  <!--<gpg.executable>gpg2</gpg.executable>-->
-  <!--<gpg.keyname>${env.GPG_KEY_NAME}</gpg.keyname>-->
-  <!--<gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>-->
-  <!--</properties>-->
-  <!--</profile>-->
-  <!--</profiles>-->
+  <profiles>
+    <profile>
+      <id>ossrh</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <gpg.executable>gpg2</gpg.executable>
+        <gpg.keyname>${env.GPG2_KEY}</gpg.keyname>
+        <gpg.passphrase>${env.GPG2_PASS}</gpg.passphrase>
+      </properties>
+    </profile>
+  </profiles>
 
 </settings>

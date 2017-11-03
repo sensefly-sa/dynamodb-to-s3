@@ -465,18 +465,6 @@
         </executions>
       </plugin>
 
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>${nexus-staging-plugin.version}</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-      </plugin>
-
     </plugins>
   </build>
 
@@ -507,20 +495,32 @@
             </executions>
           </plugin>
 
-          <!--<plugin>-->
-          <!--<groupId>org.apache.maven.plugins</groupId>-->
-          <!--<artifactId>maven-gpg-plugin</artifactId>-->
-          <!--<version>${gpg-plugin.version}</version>-->
-          <!--<executions>-->
-          <!--<execution>-->
-          <!--<id>sign-artifacts</id>-->
-          <!--<phase>verify</phase>-->
-          <!--<goals>-->
-          <!--<goal>sign</goal>-->
-          <!--</goals>-->
-          <!--</execution>-->
-          <!--</executions>-->
-          <!--</plugin>-->
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>${nexus-staging-plugin.version}</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${gpg-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
 
         </plugins>
       </build>
