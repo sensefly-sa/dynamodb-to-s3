@@ -28,17 +28,6 @@
     <developerConnection>scm:git:git@github.com:sensefly-sa/dynamodb-to-s3.git</developerConnection>
   </scm>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
-
   <properties>
     <docker.image.name>sensefly/dynamodb-to-s3</docker.image.name>
 
@@ -59,11 +48,8 @@
 
     <antrun-plugin.version>1.8</antrun-plugin.version>
     <dockerfile-plugin.version>1.3.6</dockerfile-plugin.version>
-    <gpg-plugin.version>1.6</gpg-plugin.version>
     <jacoco-plugin.version>0.7.9</jacoco-plugin.version>
     <jcabi-dynamodb-plugin.version>0.9.1</jcabi-dynamodb-plugin.version>
-    <nexus-staging-plugin.version>1.6.8</nexus-staging-plugin.version>
-    <release-plugin.version>2.5.3</release-plugin.version>
 
   </properties>
 
@@ -465,66 +451,28 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>ossrh</id>
-      <build>
-        <plugins>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>${nexus-staging-plugin.version}</version>
-            <extensions>true</extensions>
-            <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
-            </configuration>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>${gpg-plugin.version}</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>
