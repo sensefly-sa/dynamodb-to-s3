@@ -6,4 +6,4 @@ services:
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t db72c61d-aa61-4b80-9ffd-1a135d29a85f
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-  - ./mvnw deploy dockerfile:push@push-latest dockerfile:push@push-version -B -Pdeploy --settings .mvn/settings.xml
+  - ./mvnw deploy dockerfile:push@push-latest dockerfile:push@push-version -DskipTests -B -Pdeploy --settings .mvn/settings.xml
