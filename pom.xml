@@ -470,7 +470,7 @@
 
   <profiles>
     <profile>
-      <id>deploy</id>
+      <id>ossrh</id>
       <build>
         <plugins>
 
