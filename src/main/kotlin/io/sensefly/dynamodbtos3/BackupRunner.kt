@@ -8,8 +8,9 @@ import javax.inject.Inject
 
 
 @Component
-class BackupRunner @Inject constructor(private val backupTable: BackupTable,
-                                       private val taskScheduler: ThreadPoolTaskScheduler) {
+class BackupRunner @Inject constructor(
+    private val backupTable: BackupTable,
+    private val taskScheduler: ThreadPoolTaskScheduler) {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
