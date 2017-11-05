@@ -4,6 +4,7 @@ services:
   - docker
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
   - ./gradlew pushDockerImages
 deploy:
   provider: script

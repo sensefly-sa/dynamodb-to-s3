@@ -34,21 +34,11 @@ task buildDocker(type: DockerBuildImage, dependsOn: 'copyDockerFiles') {
 task pushImageVersion(type: DockerPushImage, dependsOn: 'buildDocker') {
   imageName = "sensefly/dynamodb-to-s3"
   tag = project.version
-  registryCredentials = {
-    username = System.env.DOCKER_USER
-    password = System.env.DOCKER_PASS
-    email = System.env.DOCKER_EMAIL
-  }
 }
 
 task pushImageLatest(type: DockerPushImage, dependsOn: 'buildDocker') {
   imageName = "sensefly/dynamodb-to-s3"
   tag = "latest"
-  registryCredentials = {
-    username = System.env.DOCKER_USER
-    password = System.env.DOCKER_PASS
-    email = System.env.DOCKER_EMAIL
-  }
 }
 
 task pushDockerImages(dependsOn: ['pushImageVersion', 'pushImageLatest']) {}
