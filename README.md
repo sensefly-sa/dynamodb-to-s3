@@ -91,4 +91,4 @@ docker run \
 
 ## Build
 
-Run `./mvnw package`
+Run `./gradlew build`
