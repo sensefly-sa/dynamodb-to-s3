@@ -1,7 +1,8 @@
 # Backup DynamoDB to S3
 
 [![Build Status](https://travis-ci.org/sensefly-sa/dynamodb-to-s3.svg?branch=master)](https://travis-ci.org/sensefly-sa/dynamodb-to-s3)
-[ ![Download](https://api.bintray.com/packages/sensefly/maven/dynamodb-to-s3/images/download.svg) ](https://bintray.com/sensefly/maven/dynamodb-to-s3/_latestVersion)
+[![codecov](https://codecov.io/gh/sensefly-sa/log4j-cloudwatch-appender/branch/master/graph/badge.svg)](https://codecov.io/gh/sensefly-sa/log4j-cloudwatch-appender)
+[![Download](https://api.bintray.com/packages/sensefly/maven/dynamodb-to-s3/images/download.svg) ](https://bintray.com/sensefly/maven/dynamodb-to-s3/_latestVersion)
 
 Simple DynamoDB dump to S3.
   
