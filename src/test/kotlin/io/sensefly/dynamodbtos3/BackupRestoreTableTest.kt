@@ -17,11 +17,12 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-
+// To run with IntelliJ add VM arguments:
+// `-Djava.library.path=build/runtimeTestLibraries`
 @RunWith(SpringRunner::class)
 @ActiveProfiles("test")
 @SpringBootTest(classes = arrayOf(TestConfig::class))
-class BackupRestoreTableIT {
+class BackupRestoreTableTest {
 
   companion object {
     const val BUCKET = "test-bucket"
@@ -53,7 +54,8 @@ class BackupRestoreTableIT {
         .withTableName("users-to-backup")
         .withKeySchema(KeySchemaElement("id", "HASH"))
         .withAttributeDefinitions(AttributeDefinition("id", "S"))
-        .withProvisionedThroughput(ProvisionedThroughput().withReadCapacityUnits(10).withWriteCapacityUnits(10))
+        .withProvisionedThroughput(
+            ProvisionedThroughput().withReadCapacityUnits(10).withWriteCapacityUnits(10))
     amazonDynamoDB.createTable(request)
 
     request.tableName = "users-to-restore"
