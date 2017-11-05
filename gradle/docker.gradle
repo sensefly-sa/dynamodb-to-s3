@@ -1,17 +1,16 @@
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-
 buildscript {
   repositories {
     jcenter()
   }
-
   dependencies {
-    classpath 'com.bmuschko:gradle-docker-plugin:3.1.0'
+    classpath 'com.bmuschko:gradle-docker-plugin:3.2.0'
   }
 }
 
+// use fully qualified class name
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 
+import com.bmuschko.gradle.docker.tasks.image.*
 
 task copyDockerFiles(type: Copy, dependsOn: 'bootRepackage') {
   description = "Copy Dockerfile and required data to build directory"
@@ -19,6 +18,7 @@ task copyDockerFiles(type: Copy, dependsOn: 'bootRepackage') {
   from "${project.buildDir}/libs"
   into { "${project.buildDir}/docker" }
   exclude "*.jar.original"
+  rename(jar.archiveName, "app.jar")
 }
 
 task buildDocker(type: DockerBuildImage, dependsOn: 'copyDockerFiles') {
@@ -30,3 +30,25 @@ task buildDocker(type: DockerBuildImage, dependsOn: 'copyDockerFiles') {
   inputDir = project.file("${project.buildDir}/docker")
   tags = [versionTag, latestTag]
 }
+
+task pushImageVersion(type: DockerPushImage, dependsOn: 'buildDocker') {
+  imageName = "sensefly/dynamodb-to-s3"
+  tag = project.version
+  registryCredentials = {
+    username = System.env.DOCKER_USER
+    password = System.env.DOCKER_PASS
+    email = System.env.DOCKER_EMAIL
+  }
+}
+
+task pushImageLatest(type: DockerPushImage, dependsOn: 'buildDocker') {
+  imageName = "sensefly/dynamodb-to-s3"
+  tag = "latest"
+  registryCredentials = {
+    username = System.env.DOCKER_USER
+    password = System.env.DOCKER_PASS
+    email = System.env.DOCKER_EMAIL
+  }
+}
+
+task pushDockerImages(dependsOn: ['pushImageVersion', 'pushImageLatest']) {}

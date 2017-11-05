@@ -3,7 +3,7 @@ FROM openjdk:8-jre-alpine
 ENV SPRING_OUTPUT_ANSI_ENABLED ALWAYS
 ENV JAVA_OPTS ""
 
-ADD @project.build.finalName@.jar /app.jar
+ADD app.jar /app.jar
 ADD log4j-cloudwatch.xml /
 ADD entrypoint.sh /
 
