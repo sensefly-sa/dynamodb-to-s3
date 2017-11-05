@@ -16,6 +16,7 @@ apply plugin: "jacoco"
 apply plugin: "idea"
 apply plugin: "maven"
 apply plugin: "maven-publish"
+//apply from: "gradle/docker.gradle"
 
 group = 'io.sensefly.dynamodb-to-s3'
 
@@ -30,12 +31,13 @@ compileTestKotlin {
 repositories {
   jcenter()
   mavenCentral()
+  maven { url 'http://dynamodb-local.s3-website-us-west-2.amazonaws.com/release' }
 }
 
 ext {
-  awsVersion = '1.11.220'
-  kotlinVersion = '1.1.51'
-  springBootVersion = '1.5.8.RELEASE'
+  aws_version = '1.11.220'
+  kotlin_version = '1.1.51'
+  runtimeTestLibraries = "$buildDir/runtimeTestLibraries"
 }
 
 dependencies {
@@ -44,10 +46,10 @@ dependencies {
     exclude(module: "logback-classic")
   }
   compile "org.springframework.boot:spring-boot-starter-log4j2"
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
-  compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-  compile "com.amazonaws:aws-java-sdk-core:$awsVersion"
-  compile "com.amazonaws:aws-java-sdk-dynamodb:$awsVersion"
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+  compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+  compile "com.amazonaws:aws-java-sdk-core:$aws_version"
+  compile "com.amazonaws:aws-java-sdk-dynamodb:$aws_version"
   compile 'javax.inject:javax.inject:1'
   compile 'com.github.alexmojaki:s3-stream-upload:1.0.1'
   compile 'com.google.guava:guava:23.2-jre'
@@ -57,7 +59,23 @@ dependencies {
   testCompile 'org.springframework.boot:spring-boot-starter-test'
   testCompile 'net.javacrumbs.json-unit:json-unit:1.25.1'
   testCompile 'com.nhaarman:mockito-kotlin-kt1.1:1.5.0'
-  testCompile  'io.findify:s3mock_2.12:0.2.3'
+  testCompile 'io.findify:s3mock_2.12:0.2.3'
+  testCompile 'com.amazonaws:DynamoDBLocal:1.11.86'
+
+  //Need sqlite for embedded dynamodb instance
+  testRuntime 'com.almworks.sqlite4java:sqlite4java:1.0.392'
+}
+
+//copy current test runtime configurations into runtimeTestLibraries dir
+task copyRuntimeLibs(type: Copy) {
+  into runtimeTestLibraries
+  from configurations.testRuntime
+}
+
+//set the system property library path to the current runtimeTestLibraries dir
+tasks.withType(Test) {
+  dependsOn 'copyRuntimeLibs'
+  systemProperty "java.library.path", runtimeTestLibraries
 }
 
 jacoco {

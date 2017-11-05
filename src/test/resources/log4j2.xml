@@ -19,7 +19,6 @@
   <Loggers>
     <logger name="io.sensefly" level="debug"/>
 
-    <logger name="org.apache.sshd.common.util.SecurityUtils" level="warn"/>
     <logger name="org.springframework.boot.actuate.endpoint.jmx" level="warn"/>
     <Root level="info">
       <AppenderRef ref="Console"/>

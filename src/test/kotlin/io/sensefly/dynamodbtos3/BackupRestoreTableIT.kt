@@ -1,8 +1,7 @@
 package io.sensefly.dynamodbtos3
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.AttributeValue
-import com.amazonaws.services.dynamodbv2.model.ScanRequest
+import com.amazonaws.services.dynamodbv2.model.*
 import com.amazonaws.services.s3.AmazonS3
 import io.sensefly.dynamodbtos3.config.TestConfig
 import org.assertj.core.api.Assertions.assertThat
@@ -17,6 +16,7 @@ import java.nio.ByteBuffer
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+
 
 @RunWith(SpringRunner::class)
 @ActiveProfiles("test")
@@ -38,6 +38,27 @@ class BackupRestoreTableIT {
 
   @Inject
   lateinit var restoreTable: RestoreTable
+
+  @Before
+  fun createTables() {
+    val existingTables = amazonDynamoDB.listTables().tableNames
+    if (existingTables.contains("users-to-backup")) {
+      amazonDynamoDB.deleteTable("users-to-backup")
+    }
+    if (existingTables.contains("users-to-restore")) {
+      amazonDynamoDB.deleteTable("users-to-restore")
+    }
+
+    val request = CreateTableRequest()
+        .withTableName("users-to-backup")
+        .withKeySchema(KeySchemaElement("id", "HASH"))
+        .withAttributeDefinitions(AttributeDefinition("id", "S"))
+        .withProvisionedThroughput(ProvisionedThroughput().withReadCapacityUnits(10).withWriteCapacityUnits(10))
+    amazonDynamoDB.createTable(request)
+
+    request.tableName = "users-to-restore"
+    amazonDynamoDB.createTable(request)
+  }
 
   @Before
   fun fillTable() {
