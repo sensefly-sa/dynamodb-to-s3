@@ -34,6 +34,7 @@ class CommandLineParser @Inject constructor(
 
     when (jc.parsedCommand) {
       "backup" -> {
+        metricsConfig.setupJvmMetrics(backupCmd.jvmMetrics)
         metricsConfig.setupCloudwatchMetrics(backupCmd.cloudwatchNamespace)
         backupRunner.run(backupCmd.parseTables(), backupCmd.bucket, backupCmd.cron, backupCmd.readPercentage, backupCmd.pattern)
       }

@@ -25,6 +25,9 @@ class BackupCommand {
   @Parameter(names = arrayOf("-n", "--namespace"), description = "Cloudwatch namespace to send metrics.", order = 5)
   var cloudwatchNamespace: String? = null
 
+  @Parameter(names = arrayOf("--jvmMetrics"), description = "Collect JVM metrics")
+  var jvmMetrics = false
+
   fun parseTables(): List<String> {
     return tables.map { it.split(",") }
         .flatten()

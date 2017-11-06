@@ -4,16 +4,18 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.dynamodbv2.model.ReturnConsumedCapacity
 import com.amazonaws.services.dynamodbv2.model.ScanRequest
-import com.codahale.metrics.annotation.Timed
+import com.codahale.metrics.MetricRegistry
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Stopwatch
 import com.google.common.util.concurrent.RateLimiter
 import io.sensefly.dynamodbtos3.writer.WriterFactory
 import org.slf4j.LoggerFactory
+import org.springframework.boot.actuate.metrics.GaugeService
 import org.springframework.stereotype.Component
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit.NANOSECONDS
 import javax.inject.Inject
 
 @Component
@@ -21,7 +23,9 @@ class BackupTable @Inject constructor(
     private val dynamoDB: DynamoDB,
     private val amazonDynamoDB: AmazonDynamoDB,
     private val objectMapper: ObjectMapper,
-    private val writerFactory: WriterFactory<*>) {
+    private val writerFactory: WriterFactory<*>,
+    private val metricRegistry: MetricRegistry,
+    private val gaugeService: GaugeService) {
 
   companion object {
     const val DEFAULT_PATTERN = "yyyy/MM/dd"
@@ -31,7 +35,6 @@ class BackupTable @Inject constructor(
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  @Timed
   fun backup(tableName: String, bucket: String, readPercentage: Double = DEFAULT_READ_PERCENTAGE, pattern: String = DEFAULT_PATTERN) {
 
     val stopwatch = Stopwatch.createStarted()
@@ -79,6 +82,9 @@ class BackupTable @Inject constructor(
         val consumed = Math.round(consumedCapacity * 10).toInt()
         val wait = rateLimiter.acquire(consumed)
 
+        gaugeService.submit("$tableName-backup-items", count.toDouble())
+        metricRegistry.timer("$tableName-backup-duration")
+            .update(stopwatch.elapsed(NANOSECONDS), NANOSECONDS)
         log.debug("consumed: {}, wait: {}, capacity: {}, count: {}", consumed, wait, consumedCapacity, count)
 
       } while (scanResult.lastEvaluatedKey != null)

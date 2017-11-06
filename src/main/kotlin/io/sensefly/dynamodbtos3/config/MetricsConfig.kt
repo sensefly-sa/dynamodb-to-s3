@@ -13,8 +13,8 @@ import io.github.azagniotov.metrics.reporter.cloudwatch.CloudWatchReporter
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.util.concurrent.TimeUnit
-import javax.annotation.PostConstruct
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeUnit.SECONDS
 
 @Configuration
 @EnableMetrics(proxyTargetClass = true)
@@ -35,12 +35,13 @@ class MetricsConfig : MetricsConfigurerAdapter() {
     return healthCheckRegistry
   }
 
-  @PostConstruct
-  fun init() {
-    log.debug("Registering JVM gauges")
-    metricRegistry.register(METRIC_JVM_MEMORY, MemoryUsageGaugeSet())
-    metricRegistry.register(METRIC_JVM_GARBAGE, GarbageCollectorMetricSet())
-    metricRegistry.register(METRIC_JVM_THREADS, ThreadStatesGaugeSet())
+  fun setupJvmMetrics(jvmMetrics: Boolean) {
+    if (jvmMetrics) {
+      log.debug("Registering JVM gauges")
+      metricRegistry.register(METRIC_JVM_MEMORY, MemoryUsageGaugeSet())
+      metricRegistry.register(METRIC_JVM_GARBAGE, GarbageCollectorMetricSet())
+      metricRegistry.register(METRIC_JVM_THREADS, ThreadStatesGaugeSet())
+    }
   }
 
   fun setupCloudwatchMetrics(cloudwatchNamespace: String?) {
@@ -50,11 +51,11 @@ class MetricsConfig : MetricsConfigurerAdapter() {
       log.info("Init CloudWatch Metrics reporter")
       CloudWatchReporter
           .forRegistry(metricRegistry, AmazonCloudWatchAsyncClientBuilder.defaultClient(), cloudwatchNamespace)
-          .convertRatesTo(TimeUnit.SECONDS)
-          .convertDurationsTo(TimeUnit.MILLISECONDS)
+          .convertRatesTo(SECONDS)
+          .convertDurationsTo(MILLISECONDS)
           .filter(MetricFilter.ALL)
           .build()
-          .start(10, TimeUnit.SECONDS)
+          .start(10, SECONDS)
     }
   }
 
