@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import
 class TestConfig {
 
   private val log = LoggerFactory.getLogger(javaClass)
+  private val s3MockPort = 54879
 
   @Bean(destroyMethod = "shutdown")
   fun embeddedAmazonDynamoDB(): AmazonDynamoDBLocal {
@@ -33,23 +34,26 @@ class TestConfig {
     return dynamoDBLocal.amazonDynamoDB()
   }
 
-  @Bean
-  fun amazonS3(): AmazonS3 {
-    val port = 54879
-    val endPoint = "http://localhost:$port"
-    log.info("Configure S3 mock on {}", endPoint)
-
-    S3Mock.Builder()
-        .withPort(port)
+  @Bean(destroyMethod = "stop")
+  fun s3Mock(): S3Mock {
+    val s3Mock = S3Mock.Builder()
+        .withPort(s3MockPort)
         .withInMemoryBackend()
         .build()
-        .start()
+    s3Mock.start()
+    return s3Mock
+  }
+
+  @Bean
+  fun amazonS3(s3Mock: S3Mock): AmazonS3 {
+    val endPoint = "http://localhost:$s3MockPort"
+    log.info("Configure S3 mock on {}", endPoint)
+
     return AmazonS3ClientBuilder.standard()
         .withPathStyleAccessEnabled(true)
         .withEndpointConfiguration(EndpointConfiguration(endPoint, "eu-central-1"))
         .withCredentials(AWSStaticCredentialsProvider(AnonymousAWSCredentials()))
         .build()
   }
-
 
 }

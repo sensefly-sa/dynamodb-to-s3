@@ -5,11 +5,11 @@ services:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-  - ./gradlew pushDockerImages
+  - ./gradlew pushImageVersion
 deploy:
   provider: script
   script:
-    - ./gradlew bintrayUpload
+    - ./gradlew pushImageLatest bintrayUpload
   skip_cleanup: true
   on:
     tags: true

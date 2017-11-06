@@ -8,7 +8,7 @@ import java.net.URI
 
 class CommandLineParserTest {
 
-  private val parser = CommandLineParser(mock(), mock())
+  private val parser = CommandLineParser(mock(), mock(), mock())
 
   @Test
   fun backupCommand() {

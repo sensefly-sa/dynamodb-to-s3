@@ -2,6 +2,7 @@ plugins {
   id "org.jetbrains.kotlin.jvm" version "1.1.51"
   id "org.jetbrains.kotlin.plugin.allopen" version "1.1.51"
   id 'org.springframework.boot' version '1.5.8.RELEASE'
+  id "io.spring.dependency-management" version "1.0.3.RELEASE"
   id "com.jfrog.bintray" version "1.7.3"
 }
 
@@ -40,6 +41,12 @@ ext {
   runtimeTestLibraries = "$buildDir/runtimeTestLibraries"
 }
 
+dependencyManagement {
+  imports {
+    mavenBom 'org.springframework.boot:spring-boot-starter-parent:1.5.8.RELEASE'
+  }
+}
+
 dependencies {
   compile('org.springframework.boot:spring-boot-starter-actuator') {
     exclude(module: "logback-core")
@@ -54,7 +61,15 @@ dependencies {
   compile 'com.github.alexmojaki:s3-stream-upload:1.0.1'
   compile 'com.google.guava:guava:23.2-jre'
   compile 'com.beust:jcommander:1.72'
-  compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2' // TODO get version from spring boot
+  compile "com.fasterxml.jackson.module:jackson-module-kotlin:${dependencyManagement.importedProperties['jackson.version']}"
+  compile 'com.ryantenney.metrics:metrics-spring:3.1.3'
+  compile "io.dropwizard.metrics:metrics-jvm:${dependencyManagement.importedProperties['dropwizard-metrics.version']}"
+  compile ('io.github.azagniotov:dropwizard-metrics-cloudwatch:1.0.5') {
+    exclude(module: "logback-core")
+    exclude(module: "logback-classic")
+  }
+
+  runtime ('io.sensefly.logging.log4j:log4j-cloudwatch-appender:1.0.1')
 
   testCompile 'org.springframework.boot:spring-boot-starter-test'
   testCompile 'net.javacrumbs.json-unit:json-unit:1.25.1'

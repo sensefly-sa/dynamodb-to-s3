@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.dynamodbv2.model.ReturnConsumedCapacity
 import com.amazonaws.services.dynamodbv2.model.ScanRequest
+import com.codahale.metrics.annotation.Timed
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Stopwatch
 import com.google.common.util.concurrent.RateLimiter
@@ -30,8 +31,8 @@ class BackupTable @Inject constructor(
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  fun backup(tableName: String, bucket: String, readPercentage: Double = DEFAULT_READ_PERCENTAGE,
-             pattern: String = DEFAULT_PATTERN) {
+  @Timed
+  fun backup(tableName: String, bucket: String, readPercentage: Double = DEFAULT_READ_PERCENTAGE, pattern: String = DEFAULT_PATTERN) {
 
     val stopwatch = Stopwatch.createStarted()
 

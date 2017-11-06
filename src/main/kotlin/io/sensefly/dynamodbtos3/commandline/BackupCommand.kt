@@ -22,6 +22,9 @@ class BackupCommand {
   @Parameter(names = arrayOf("-p", "--pattern"), description = "Destination file path pattern.", order = 4)
   var pattern: String = BackupTable.DEFAULT_PATTERN
 
+  @Parameter(names = arrayOf("-n", "--namespace"), description = "Cloudwatch namespace to send metrics.", order = 5)
+  var cloudwatchNamespace: String? = null
+
   fun parseTables(): List<String> {
     return tables.map { it.split(",") }
         .flatten()

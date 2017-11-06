@@ -3,6 +3,7 @@ package io.sensefly.dynamodbtos3.commandline
 import com.beust.jcommander.JCommander
 import io.sensefly.dynamodbtos3.BackupRunner
 import io.sensefly.dynamodbtos3.RestoreTable
+import io.sensefly.dynamodbtos3.config.MetricsConfig
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
@@ -13,7 +14,8 @@ import javax.inject.Inject
 @Profile("!test")
 class CommandLineParser @Inject constructor(
     private val backupRunner: BackupRunner,
-    private val restoreTable: RestoreTable) : CommandLineRunner {
+    private val restoreTable: RestoreTable,
+    private val metricsConfig: MetricsConfig) : CommandLineRunner {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -32,6 +34,7 @@ class CommandLineParser @Inject constructor(
 
     when (jc.parsedCommand) {
       "backup" -> {
+        metricsConfig.setupCloudwatchMetrics(backupCmd.cloudwatchNamespace)
         backupRunner.run(backupCmd.parseTables(), backupCmd.bucket, backupCmd.cron, backupCmd.readPercentage, backupCmd.pattern)
       }
       "restore" -> {
