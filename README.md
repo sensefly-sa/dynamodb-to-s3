@@ -25,8 +25,8 @@ Usage: <main class> [options] [command] [command options]
       Usage: backup [options]
         Options:
         * -t, --table
-            Table to backup to S3. 
-            Comma-separated list to backup multiple tables or repeat this param.
+            Table to backup to S3. Comma-separated list to backup multiple 
+            tables or repeat this param.
             Default: []
         * -b, --bucket
             Destination S3 bucket.
@@ -39,6 +39,11 @@ Usage: <main class> [options] [command] [command options]
           -p, --pattern
             Destination file path pattern.
             Default: yyyy/MM/dd
+          -n, --namespace
+            Cloudwatch namespace to send metrics.
+          --jvmMetrics
+            Collect JVM metrics
+            Default: false
 
     restore      Restore DynamoDB table from json file hosted on S3.
       Usage: restore [options]
@@ -52,6 +57,7 @@ Usage: <main class> [options] [command] [command options]
           -w, --write-percentage
             Write capacity percentage.
             Default: 0.5
+
 ```
 
 ### Backup
@@ -89,6 +95,37 @@ docker run \
   -e AWS_SECRET_KEY=... \
   -e AWS_REGION=... \
   sensefly/dynamodb-to-s3 --help
+```
+
+Or if your instance has an IAM role, just run `docker run sensefly/dynamodb-to-s3 --help`
+
+### AWS Cloudwatch
+
+To send logs to Cloudwatch, define environment variables:
+- `CLOUDWATCH_LOG_GROUP`  
+- `JAVA_OPTS: "-Dlogging.config=/log4j-cloudwatch.xml"`  
+
+To send metrics to Cloudwatch, use `--namespace` argument.
+
+For example, this command will backup `table1` & `table2` to `dynamodb-backup` every day at 2 AM.  
+It will send 
+- logs to `dynamodb-backup` Cloudwatch log group 
+- metrics to `dynamodb-backup` Cloudwatch metrics namespace. 
+
+```
+docker run \
+  -e AWS_ACCESS_KEY=... \
+  -e AWS_SECRET_KEY=... \
+  -e AWS_REGION=... \
+  -e CLOUDWATCH_LOG_GROUP=dynamodb-backup \
+  -e JAVA_OPTS=-Dlogging.config=/log4j-cloudwatch.xml \
+  sensefly/dynamodb-to-s3 backup \
+  --table "table1,table2" \
+  --bucket dynamodb-backup \
+  --cron "0 2 * * *" \
+  --read-percentage 0.8 \
+  --pattern yyyy/MM/dd \
+  --namespace dynamodb-backup
 ```
 
 ## Build
