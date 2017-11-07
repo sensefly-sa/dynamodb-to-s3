@@ -33,10 +33,11 @@ repositories {
   jcenter()
   mavenCentral()
   maven { url 'http://dynamodb-local.s3-website-us-west-2.amazonaws.com/release' }
+  mavenLocal()
 }
 
 ext {
-  aws_version = '1.11.220'
+  aws_version = '1.11.224'
   kotlin_version = '1.1.51'
   runtimeTestLibraries = "$buildDir/runtimeTestLibraries"
 }
@@ -69,7 +70,7 @@ dependencies {
     exclude(module: "logback-classic")
   }
 
-  runtime ('io.sensefly.logging.log4j:log4j-cloudwatch-appender:1.0.1')
+  runtime ('io.sensefly.logging.log4j:log4j-cloudwatch-appender:1.0.2')
 
   testCompile 'org.springframework.boot:spring-boot-starter-test'
   testCompile 'net.javacrumbs.json-unit:json-unit:1.25.1'
