@@ -6,7 +6,7 @@ plugins {
   id "com.jfrog.bintray" version "1.7.3"
 }
 
-group = "io.sensefly.logging.log4j"
+group = 'io.sensefly.dynamodb-to-s3'
 version =  "1.1.0-SNAPSHOT"
 description = "Log4j 2.x appender for AWS CloudWatch logs"
 
@@ -17,8 +17,6 @@ apply plugin: "jacoco"
 apply plugin: "idea"
 apply plugin: "maven-publish"
 apply from: "gradle/docker.gradle"
-
-group = 'io.sensefly.dynamodb-to-s3'
 
 sourceCompatibility = 1.8
 compileKotlin {
