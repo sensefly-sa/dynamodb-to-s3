@@ -1,29 +1,37 @@
-plugins {
-  id "org.jetbrains.kotlin.jvm" version "1.1.51"
-  id "org.jetbrains.kotlin.plugin.allopen" version "1.1.51"
-  id 'org.springframework.boot' version '1.5.8.RELEASE'
-  id "io.spring.dependency-management" version "1.0.3.RELEASE"
-  id "com.jfrog.bintray" version "1.7.3"
+buildscript {
+  repositories {
+    maven { url "https://plugins.gradle.org/m2/" }
+  }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
+    classpath "org.springframework.boot:spring-boot-gradle-plugin:$spring_boot_version"
+    classpath "io.spring.gradle:dependency-management-plugin:1.0.4.RELEASE"
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+  }
 }
-
-group = 'io.sensefly.dynamodb-to-s3'
-version =  "1.1.0-SNAPSHOT"
-description = "Log4j 2.x appender for AWS CloudWatch logs"
 
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-spring'
-apply plugin: 'org.springframework.boot'
+apply plugin: "org.jetbrains.kotlin.jvm"
+apply plugin: "kotlin-allopen"
+apply plugin: "org.springframework.boot"
+apply plugin: "io.spring.dependency-management"
+apply plugin: 'com.jfrog.bintray'
 apply plugin: "jacoco"
 apply plugin: "idea"
 apply plugin: "maven-publish"
 apply from: "gradle/docker.gradle"
 
+group = 'io.sensefly.dynamodb-to-s3'
+description = "Log4j 2.x appender for AWS CloudWatch logs"
 sourceCompatibility = 1.8
+
 compileKotlin {
-  kotlinOptions.jvmTarget = "1.8"
+  kotlinOptions.jvmTarget = sourceCompatibility
 }
 compileTestKotlin {
-  kotlinOptions.jvmTarget = "1.8"
+  kotlinOptions.jvmTarget = sourceCompatibility
 }
 
 repositories {
@@ -34,14 +42,12 @@ repositories {
 }
 
 ext {
-  aws_version = '1.11.224'
-  kotlin_version = '1.1.51'
   runtimeTestLibraries = "$buildDir/runtimeTestLibraries"
 }
 
 dependencyManagement {
   imports {
-    mavenBom 'org.springframework.boot:spring-boot-starter-parent:1.5.8.RELEASE'
+    mavenBom "org.springframework.boot:spring-boot-starter-parent:$spring_boot_version"
   }
 }
 
@@ -51,7 +57,7 @@ dependencies {
     exclude(module: "logback-classic")
   }
   compile "org.springframework.boot:spring-boot-starter-log4j2"
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
   compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
   compile "com.amazonaws:aws-java-sdk-core:$aws_version"
   compile "com.amazonaws:aws-java-sdk-dynamodb:$aws_version"
@@ -88,8 +94,14 @@ tasks.withType(Test) {
   systemProperty "java.library.path", runtimeTestLibraries
 }
 
+test {
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
+
 jacoco {
-  toolVersion = "0.7.9"
+  toolVersion = jacoco_version
 }
 
 jacocoTestReport {

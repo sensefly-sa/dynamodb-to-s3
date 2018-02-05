@@ -1,6 +1,7 @@
 package io.sensefly.dynamodbtos3.commandline
 
 import com.beust.jcommander.Parameter
+import com.beust.jcommander.ParameterException
 import com.beust.jcommander.Parameters
 import io.sensefly.dynamodbtos3.BackupTable
 
@@ -16,13 +17,16 @@ class BackupCommand {
   @Parameter(names = arrayOf("-c", "--cron"), description = "Cron pattern. (http://www.manpagez.com/man/5/crontab/)", order = 2)
   var cron: String? = null
 
-  @Parameter(names = arrayOf("-r", "--read-percentage"), description = "Read capacity percentage.", order = 3)
-  var readPercentage: Double = BackupTable.DEFAULT_READ_PERCENTAGE
+  @Parameter(names = arrayOf("--read-percentage"), description = "Read percentage based on current table capacity. Cannot be used with '--read-capacity'.", order = 3)
+  var readPercentage: Double? = null
 
-  @Parameter(names = arrayOf("-p", "--pattern"), description = "Destination file path pattern.", order = 4)
+  @Parameter(names = arrayOf("--read-capacity"), description = "Read capacity (useful if auto scaling enabled). Cannot be used with '--read-percentage'.", order = 4)
+  var readCapacity: Int? = null
+
+  @Parameter(names = arrayOf("-p", "--pattern"), description = "Destination file path pattern.", order = 5)
   var pattern: String = BackupTable.DEFAULT_PATTERN
 
-  @Parameter(names = arrayOf("-n", "--namespace"), description = "Cloudwatch namespace to send metrics.", order = 5)
+  @Parameter(names = arrayOf("-n", "--namespace"), description = "Cloudwatch namespace to send metrics.", order = 6)
   var cloudwatchNamespace: String? = null
 
   @Parameter(names = arrayOf("--jvmMetrics"), description = "Collect JVM metrics")
@@ -33,6 +37,15 @@ class BackupCommand {
         .flatten()
         .filter { it.isNotBlank() }
         .map { it.trim() }
+  }
+
+  fun validate() {
+    if (readPercentage == null && readCapacity == null) {
+      throw ParameterException("Missing read configuration. Use '--read-percentage' or '--read-capacity' parameter.")
+    }
+    if (readPercentage != null && readCapacity != null) {
+      throw ParameterException("Cannot use '--read-percentage' and '--read-capacity' together.")
+    }
   }
 
 }

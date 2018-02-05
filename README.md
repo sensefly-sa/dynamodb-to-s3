@@ -25,17 +25,17 @@ Usage: <main class> [options] [command] [command options]
       Usage: backup [options]
         Options:
         * -t, --table
-            Table to backup to S3. Comma-separated list to backup multiple 
-            tables or repeat this param.
+            Table to backup to S3. Comma-separated list to backup multiple tables or repeat this param.
             Default: []
         * -b, --bucket
             Destination S3 bucket.
             Default: <empty string>
           -c, --cron
             Cron pattern. (http://www.manpagez.com/man/5/crontab/)
-          -r, --read-percentage
-            Read capacity percentage.
-            Default: 0.5
+          --read-percentage
+            Read percentage based on current table capacity. Cannot be used with '--read-capacity'.
+          --read-capacity
+            Read capacity (useful if auto scaling enabled). Cannot be used with '--read-percentage'.
           -p, --pattern
             Destination file path pattern.
             Default: yyyy/MM/dd
@@ -66,6 +66,7 @@ Usage: <main class> [options] [command] [command options]
 java -jar dynamodb-to-s3-<version>.jar backup \
   --table my-table \
   --table my-other-table \
+  --read-capacity 100 \
   --bucket my-bucket
 ```
 

@@ -1,7 +1,7 @@
 package io.sensefly.dynamodbtos3
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.*
+import com.amazonaws.services.dynamodbv2.model.AttributeValue
+import com.amazonaws.services.dynamodbv2.model.ScanRequest
 import com.amazonaws.services.s3.AmazonS3
 import io.sensefly.dynamodbtos3.config.TestConfig
 import org.assertj.core.api.Assertions.assertThat
@@ -22,14 +22,11 @@ import javax.inject.Inject
 @RunWith(SpringRunner::class)
 @ActiveProfiles("test")
 @SpringBootTest(classes = arrayOf(TestConfig::class))
-class BackupRestoreTableTest {
+class BackupRestoreTableTest : AbstractTestWithDynamoDB() {
 
   companion object {
     const val BUCKET = "test-bucket"
   }
-
-  @Inject
-  lateinit var amazonDynamoDB: AmazonDynamoDB
 
   @Inject
   lateinit var amazonS3: AmazonS3
@@ -39,28 +36,6 @@ class BackupRestoreTableTest {
 
   @Inject
   lateinit var restoreTable: RestoreTable
-
-  @Before
-  fun createTables() {
-    val existingTables = amazonDynamoDB.listTables().tableNames
-    if (existingTables.contains("users-to-backup")) {
-      amazonDynamoDB.deleteTable("users-to-backup")
-    }
-    if (existingTables.contains("users-to-restore")) {
-      amazonDynamoDB.deleteTable("users-to-restore")
-    }
-
-    val request = CreateTableRequest()
-        .withTableName("users-to-backup")
-        .withKeySchema(KeySchemaElement("id", "HASH"))
-        .withAttributeDefinitions(AttributeDefinition("id", "S"))
-        .withProvisionedThroughput(
-            ProvisionedThroughput().withReadCapacityUnits(10).withWriteCapacityUnits(10))
-    amazonDynamoDB.createTable(request)
-
-    request.tableName = "users-to-restore"
-    amazonDynamoDB.createTable(request)
-  }
 
   @Before
   fun fillTable() {
@@ -86,10 +61,10 @@ class BackupRestoreTableTest {
       item.put("empty-map", AttributeValue().withM(mutableMapOf<String, AttributeValue>()))
       item.put("attribute", AttributeValue().withL(AttributeValue("inner")))
 
-      amazonDynamoDB.putItem("users-to-backup", item)
+      amazonDynamoDB.putItem(TABLE_TO_BACKUP, item)
     }
 
-    assertThat(amazonDynamoDB.scan(ScanRequest().withTableName("users-to-backup")).items).hasSize(30)
+    assertThat(amazonDynamoDB.scan(ScanRequest().withTableName(TABLE_TO_BACKUP)).items).hasSize(30)
   }
 
   @Before
@@ -99,15 +74,15 @@ class BackupRestoreTableTest {
 
   @Test
   fun backupAndRestore() {
-    backupTable.backup("users-to-backup", BUCKET, readPercentage = 100.0)
+    backupTable.backup(TABLE_TO_BACKUP, BUCKET, readPercentage = 100.0)
 
     val dirs = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
 
-    restoreTable.restore(URI("s3://$BUCKET/$dirs/users-to-backup.json"), "users-to-restore", writePercentage = 100.0)
+    restoreTable.restore(URI("s3://$BUCKET/$dirs/users-to-backup.json"), TABLE_TO_RESTORE, writePercentage = 100.0)
 
-    val sourceItems = amazonDynamoDB.scan(ScanRequest().withTableName("users-to-backup")).items
+    val sourceItems = amazonDynamoDB.scan(ScanRequest().withTableName(TABLE_TO_BACKUP)).items
         .sortedWith(compareBy({ it["id"]?.s }))
-    val restoredItems = amazonDynamoDB.scan(ScanRequest().withTableName("users-to-restore")).items
+    val restoredItems = amazonDynamoDB.scan(ScanRequest().withTableName(TABLE_TO_RESTORE)).items
         .sortedWith(compareBy({ it["id"]?.s }))
 
     assertThat(sourceItems).hasSameSizeAs(restoredItems)
