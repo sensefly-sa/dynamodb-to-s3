@@ -18,6 +18,7 @@
 
   <Loggers>
     <logger name="io.sensefly" level="info"/>
+    <logger name="alex.mojaki.s3upload" level="warn"/>
     <Root level="warn">
       <AppenderRef ref="Console"/>
     </Root>

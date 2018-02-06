@@ -32,12 +32,10 @@ class BackupRunner @Inject constructor(
   }
 
   private fun backup(table: String, bucket: String, readPercentage: Double?, readCapacity: Int?, pattern: String) {
-    if (readPercentage != null) {
-      backupTable.backup(table, bucket, readPercentage, pattern)
+    when {
+      readPercentage != null -> backupTable.backup(table, bucket, readPercentage, pattern)
+      readCapacity != null -> backupTable.backup(table, bucket, readCapacity, pattern)
+      else -> throw ParameterException("Missing read configuration. Use '--read-percentage' or '--read-capacity' parameter.")
     }
-    if (readCapacity != null) {
-      backupTable.backup(table, bucket, readCapacity, pattern)
-    }
-    throw ParameterException("Missing read configuration. Use '--read-percentage' or '--read-capacity' parameter.")
   }
 }

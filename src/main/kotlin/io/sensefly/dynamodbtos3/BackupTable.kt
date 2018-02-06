@@ -29,7 +29,7 @@ class BackupTable @Inject constructor(
 
   companion object {
     const val DEFAULT_PATTERN = "yyyy/MM/dd"
-    private const val LOG_PROGRESS_FREQ = 5000
+    private const val LOG_PROGRESS_FREQ = 10_000
   }
 
   private val log = LoggerFactory.getLogger(javaClass)
