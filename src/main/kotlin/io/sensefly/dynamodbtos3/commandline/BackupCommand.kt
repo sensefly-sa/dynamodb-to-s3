@@ -8,28 +8,28 @@ import io.sensefly.dynamodbtos3.BackupTable
 @Parameters(commandDescription = "Backup DynamoDB tables to S3 bucket.")
 class BackupCommand {
 
-  @Parameter(names = arrayOf("-t", "--table"), description = "Table to backup to S3. Comma-separated list to backup multiple tables or repeat this param.", required = true, order = 0)
+  @Parameter(names = ["-t", "--table"], description = "Table to backup to S3. Comma-separated list to backup multiple tables or repeat this param.", required = true, order = 0)
   var tables: List<String> = arrayListOf()
 
-  @Parameter(names = arrayOf("-b", "--bucket"), description = "Destination S3 bucket.", required = true, order = 1)
+  @Parameter(names = ["-b", "--bucket"], description = "Destination S3 bucket.", required = true, order = 1)
   var bucket: String = ""
 
-  @Parameter(names = arrayOf("-c", "--cron"), description = "Cron pattern. (http://www.manpagez.com/man/5/crontab/)", order = 2)
+  @Parameter(names = ["-c", "--cron"], description = "Cron pattern. (http://www.manpagez.com/man/5/crontab/)", order = 2)
   var cron: String? = null
 
-  @Parameter(names = arrayOf("--read-percentage"), description = "Read percentage based on current table capacity. Cannot be used with '--read-capacity'.", order = 3)
+  @Parameter(names = ["--read-percentage"], description = "Read percentage based on current table capacity. Cannot be used with '--read-capacity'.", order = 3)
   var readPercentage: Double? = null
 
-  @Parameter(names = arrayOf("--read-capacity"), description = "Read capacity (useful if auto scaling enabled). Cannot be used with '--read-percentage'.", order = 4)
+  @Parameter(names = ["--read-capacity"], description = "Read capacity (useful if auto scaling enabled). Cannot be used with '--read-percentage'.", order = 4)
   var readCapacity: Int? = null
 
-  @Parameter(names = arrayOf("-p", "--pattern"), description = "Destination file path pattern.", order = 5)
+  @Parameter(names = ["-p", "--pattern"], description = "Destination file path pattern.", order = 5)
   var pattern: String = BackupTable.DEFAULT_PATTERN
 
-  @Parameter(names = arrayOf("-n", "--namespace"), description = "Cloudwatch namespace to send metrics.", order = 6)
+  @Parameter(names = ["-n", "--namespace"], description = "Cloudwatch namespace to send metrics.", order = 6)
   var cloudwatchNamespace: String? = null
 
-  @Parameter(names = arrayOf("--jvmMetrics"), description = "Collect JVM metrics")
+  @Parameter(names = ["--jvmMetrics"], description = "Collect JVM metrics")
   var jvmMetrics = false
 
   fun parseTables(): List<String> {

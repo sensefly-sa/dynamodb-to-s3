@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @RunWith(SpringRunner::class)
 @ActiveProfiles("test")
-@SpringBootTest(classes = arrayOf(TestConfig::class))
+@SpringBootTest(classes = [(TestConfig::class)])
 class ReadLimitFactoryTest : AbstractTestWithDynamoDB() {
 
   @Inject

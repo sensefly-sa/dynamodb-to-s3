@@ -60,9 +60,9 @@ class MetricsConfig : MetricsConfigurerAdapter() {
   }
 
   companion object {
-    private val METRIC_JVM_MEMORY = "jvm.memory"
-    private val METRIC_JVM_GARBAGE = "jvm.garbage"
-    private val METRIC_JVM_THREADS = "jvm.threads"
+    private const val METRIC_JVM_MEMORY = "jvm.memory"
+    private const val METRIC_JVM_GARBAGE = "jvm.garbage"
+    private const val METRIC_JVM_THREADS = "jvm.threads"
   }
 
 }
